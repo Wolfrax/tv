@@ -1,0 +1,9 @@
+matplotlib~=3.3.1
+requests~=2.24.0
+python-dateutil~=2.8.1
+PyYAML~=5.3.1
+numpy~=1.19.2
+sseclient~=0.0.26
+windrose~=1.6.8
+Flask~=1.1.2
+setuptools~=49.6.0

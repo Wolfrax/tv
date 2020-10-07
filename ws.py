@@ -1,7 +1,9 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+# Mats Melander 2020-08-23
 __author__ = 'mm'
+
 
 import requests
 from sseclient import SSEClient
@@ -25,6 +27,7 @@ import sys
 import math
 
 
+# For checking system usage, like memory: print(usage("Plot")
 def using(point=""):
     usage = resource.getrusage(resource.RUSAGE_SELF)
     return '''%s: usertime=%s systime=%s mem=%s mb''' % (point, usage[0], usage[1], usage[2]/1024.0 )
@@ -33,8 +36,6 @@ def using(point=""):
 warnings.filterwarnings("ignore", category=UserWarning)
 
 app = Flask(__name__)
-
-# Mats Melander 2020-08-23
 
 conf = yaml.load(open('auth.yml'), Loader=yaml.FullLoader)
 auth_key = conf['auth']['key']

@@ -13,6 +13,13 @@ As an example, weather data for station "Lund N" is [here](https://www.viltstige
 Any station available can be read by using its name, refer to this [map](https://www.trafikverket.se/trafikinformation/vag/?TrafficType=personalTraffic&map=1%2F606442.17%2F6886316.22%2F&Layers=RoadWeather%2b)
 and zoom in to find the right name.
 
+To use the API, an authorization key is needed, a [registration](https://api.trafikinfo.trafikverket.se/Account/Register)
+is needed (free of charge). The key is available there.
+Place the key in file `auth.yml` (in the same directory as `ws.py`) using syntax:
+
+    auth:
+        key: 71fa8aa80d...
+    
 There are some specifics to the implementation described below.
 
 ## SSE
