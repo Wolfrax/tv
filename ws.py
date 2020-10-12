@@ -323,6 +323,12 @@ if __name__ == "__main__":
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
 
+    # In case of loggin to /var/log/syslog
+    # handler = logging.handlers.SysLogHandler(address='/dev/log')
+    # handler.setFormatter(formatter)
+    # handler.setLevel(logging.DEBUG)
+    # logger.addHandler(handler)
+
     logger.info("Start v0.9")
     logger.info("Station: {}".format(stn_name))
 
