@@ -25,6 +25,7 @@ import resource
 from logging.handlers import RotatingFileHandler
 import sys
 import math
+import sdnotify
 
 
 # For checking system usage, like memory: print(usage("Plot")
@@ -200,7 +201,7 @@ class Graph:
             bin = numpy.digitize(wind_dir_hour[i], bins)
             if bin < len(WIND_LABELS):
                 self.ax5.annotate(WIND_LABELS[bin], (wind_time_hour[i], wind_val_hour[i]),
-                                  xytext=(0, -20), textcoords='offset points')
+                                  xytext=(0, 15), textcoords='offset points')
 
         self.ax5.xaxis.set_major_locator(self.hours)
         self.ax5.xaxis.set_major_formatter(self.h_fmt)
@@ -343,9 +344,12 @@ if __name__ == "__main__":
 
     bins = numpy.linspace(0, 360, len(WIND_LABELS))
 
+    dog = sdnotify.SystemdNotifier()
+
     while True:
         try:
             for msg in messages:
+                dog.notify("WATCHDOG=1")
                 if msg.data:
                     data = json.loads(msg.data)
                     msr.add(data)
