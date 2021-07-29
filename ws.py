@@ -133,9 +133,7 @@ class Graph:
         hum = [msr["Air"]["RelativeHumidity"]["Value"] for msr in data]
 
         rain = [msr['Aggregated10minutes']['Precipitation']['TotalWaterEquivalent']['Value'] for msr in data]
-        rain_hourly = [msr["Precipitation"]["Hourly"] for msr in data]
-        # acc_rain = [round(sum(rain[:i]), 1) for i in range(1, len(rain) + 1)]
-        acc_rain_hourly = [round(sum(rain_hourly[:i]), 1) for i in range(1, len(rain) + 1)]
+        acc_rain = numpy.round(numpy.cumsum(rain), decimals=1)
 
         wind_dir = [msr["Wind"][0]["Direction"]["Value"]
                     if not math.isnan(msr["Wind"][0]["Direction"]["Value"]) else 0 for msr in data]
@@ -176,12 +174,8 @@ class Graph:
         max_idx = rain.index(max(rain))
         self.ax3.annotate(str(rain[max_idx]), xy=(time[max_idx], rain[max_idx]))
 
-        # self.ax4.plot(time, acc_rain, color='tab:red')
-        # self.ax4.annotate(str(acc_rain[0]), xy=(time[0], acc_rain[0]), color='tab:red')
-        # self.ax4.annotate(str(acc_rain[-1]), xy=(time[-1], acc_rain[-1]), color='tab:red')
-
-        self.ax4.plot(time, acc_rain_hourly, color='tab:red')
-        self.ax4.annotate(str(acc_rain_hourly[-1]), xy=(time[-1], acc_rain_hourly[-1]), color='tab:red')
+        self.ax4.plot(time, acc_rain, color='tab:red')
+        self.ax4.annotate(str(acc_rain[-1]), xy=(time[-1], acc_rain[-1]), color='tab:red')
 
         self.ax5.plot(time, wind_force)
         self.ax5.plot(time, wind_force_max)
