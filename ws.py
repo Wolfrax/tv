@@ -384,7 +384,12 @@ if __name__ == "__main__":
                         air_relhum_str = str(msr.data[-1]["Air"]["RelativeHumidity"]["Value"]) + "%" \
                             if not math.isnan(msr.data[-1]["Air"]["RelativeHumidity"]["Value"]) else ""
 
-                        rain_str = ""  # Old stuff, not used anymore
+                        rain = [msr['Aggregated10minutes']['Precipitation']['TotalWaterEquivalent']['Value'] for msr in
+                                msr.data]
+                        acc_rain = str(numpy.round(numpy.cumsum(rain), decimals=1)[-1])
+                        rain_str = str(
+                            msr.data[-1]['Aggregated10minutes']['Precipitation']['TotalWaterEquivalent']['Value']) + \
+                                   "mm" + " (" + acc_rain + "mm)"
 
                         bin = numpy.digitize(msr.data[-1]["Wind"][0]["Direction"]["Value"], bins)
                         # bin can be out of index if "Direction" == "NaN"
