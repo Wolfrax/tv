@@ -118,14 +118,14 @@ class Graph:
 
         self.ax5.tick_params(axis='x', labelrotation=45)
         self.ax5.set_title("Wind")
-        self.ax5.set_ylabel("Wind force")
+        self.ax5.set_ylabel("Wind speed")
         self.ax5.grid(axis='y')
 
         self.windrose_fig = plt.figure(figsize=(5, 5))
         self.wr_ax = WindroseAxes.from_ax(fig=self.windrose_fig,
                                           theta_labels=THETA_LABELS)
         self.windrose_fig.add_axes(self.wr_ax)
-        self.wr_ax.set_title("Wind force and directions")
+        self.wr_ax.set_title("Wind speed and directions")
 
     def plot(self, data):
         time = [dateutil.parser.parse(msr["Sample"]) for msr in data]
@@ -137,9 +137,9 @@ class Graph:
 
         wind_dir = [msr["Wind"][0]["Direction"]["Value"]
                     if not math.isnan(msr["Wind"][0]["Direction"]["Value"]) else 0 for msr in data]
-        wind_force = [msr["Wind"][0]["Speed"]["Value"]
+        wind_speed = [msr["Wind"][0]["Speed"]["Value"]
                       if not math.isnan(msr["Wind"][0]["Speed"]["Value"]) else 0 for msr in data]
-        wind_force_max = [msr["Aggregated30minutes"]["Wind"]["SpeedMax"]["Value"] for msr in data]
+        wind_speed_max = [msr["Aggregated30minutes"]["Wind"]["SpeedMax"]["Value"] for msr in data]
 
         ts1 = dateutil.parser.parse(data[0]["Sample"])
         wind_dir_hour = [data[0]["Wind"][0]["Direction"]["Value"]]
@@ -177,8 +177,8 @@ class Graph:
         self.ax4.plot(time, acc_rain, color='tab:red')
         self.ax4.annotate(str(acc_rain[-1]), xy=(time[-1], acc_rain[-1]), color='tab:red')
 
-        self.ax5.plot(time, wind_force)
-        self.ax5.plot(time, wind_force_max)
+        self.ax5.plot(time, wind_speed)
+        self.ax5.plot(time, wind_speed_max)
 
         bins = numpy.linspace(0, 360, len(WIND_LABELS))
         for i, v in enumerate(wind_dir_hour):
@@ -201,7 +201,7 @@ class Graph:
         self.ax5.xaxis.set_major_locator(self.hours)
         self.ax5.xaxis.set_major_formatter(self.h_fmt)
 
-        self.wr_ax.bar(wind_dir, wind_force, normed=True, opening=0.8, edgecolor='white')
+        self.wr_ax.bar(wind_dir, wind_speed, normed=True, opening=0.8, edgecolor='white')
         self.wr_ax.set_legend()
 
     def save(self):
@@ -222,9 +222,12 @@ class Measurements:
 
         try:
             with open('ws.json', 'r', encoding='utf-8') as f:
-                self.data = json.load(f)
-                for d in self.data:
-                    self._check(d)  # Just in case there are missing fields in the file data, should not happen
+                try:
+                    self.data = json.load(f)
+                    for d in self.data:
+                        self._check(d)  # Just in case there are missing fields in the file data, should not happen
+                except json.decoder.JSONDecodeError:
+                    pass
         except FileNotFoundError:
             pass
 
@@ -398,9 +401,9 @@ if __name__ == "__main__":
                         wd_dir = str(msr.data[-1]["Wind"][0]["Direction"]["Value"]) + "°" \
                             if not math.isnan(msr.data[-1]["Wind"][0]["Direction"]["Value"]) else ""
                         wd_label_dir_str = wd_label if wd_dir == "" else wd_label + " (" + wd_dir + ")"
-                        wd_force_str = str(msr.data[-1]["Wind"][0]["Speed"]["Value"]) + "m/s" \
+                        wd_speed_str = str(msr.data[-1]["Wind"][0]["Speed"]["Value"]) + "m/s" \
                             if not math.isnan(msr.data[-1]["Wind"][0]["Speed"]["Value"]) else ""
-                        wd_force_max_str = str(msr.data[-1]["Aggregated30minutes"]["Wind"]["SpeedMax"]["Value"]) + "m/s" \
+                        wd_speed_max_str = str(msr.data[-1]["Aggregated30minutes"]["Wind"]["SpeedMax"]["Value"]) + "m/s" \
                             if not math.isnan(msr.data[-1]["Aggregated30minutes"]["Wind"]["SpeedMax"]["Value"]) else ""
 
                         html_file = render_template('ws_template.html',
@@ -413,8 +416,8 @@ if __name__ == "__main__":
                                                           air_relhum_str,
                                                           rain_str,
                                                           wd_label_dir_str,
-                                                          wd_force_str,
-                                                          wd_force_max_str
+                                                          wd_speed_str,
+                                                          wd_speed_max_str
                                                           ])
 
                         with open('ws.html', encoding='utf-8', mode='w') as outfile:
