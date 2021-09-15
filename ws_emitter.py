@@ -1,15 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-# Mats Melander 2020-08-23
+# Mats Melander 2020-08-23, 2021-09-15
 __author__ = 'mm'
 
 import json
 import logging
 import os
 from flask import Flask, render_template, request, abort
-
-# Ref: https://blog.macuyiko.com/post/2016/fixing-flask-url_for-when-behind-mod_proxy.html
 
 
 class ReverseProxied(object):
@@ -23,7 +21,6 @@ class ReverseProxied(object):
 
 
 app = Flask(__name__)
-app.logger.setLevel(logging.INFO)
 app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
 
 
