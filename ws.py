@@ -14,6 +14,7 @@ import yaml
 import warnings
 from logging.handlers import RotatingFileHandler
 import sys
+import sdnotify
 
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -178,9 +179,12 @@ if __name__ == "__main__":
     messages = SSEClient(sse_url)
     event_id = None
 
+    dog = sdnotify.SystemdNotifier()
+
     while True:
         try:
             for msg in messages:
+                dog.notify("WATCHDOG=1")
                 if msg.data:
                     data = json.loads(msg.data)
                     msr.add(data)
