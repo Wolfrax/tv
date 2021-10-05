@@ -47,8 +47,17 @@ function ws_graph(stn) {
         let wind_dir = json.data[last].Wind[0].Direction.Value ? json.data[last].Wind[0].Direction.Value : " --- "
         $("#latest_wind_speed").html(wind_speed +"m/s");
 
-        const categories = ['N' + '\u2B06', 'NE' + '\u2B08', 'E' + '\u2B95', 'SE' + '\u2B0A',
-                            'S' + '\u2B07', 'SW' + '\u2B0B', 'W' + '\u2B05', 'NW' + '\u2B09'];
+//        const categories = ['N' + '\u2B06', 'NE' + '\u2B08', 'E' + '\u2B95', 'SE' + '\u2B0A',
+//                            'S' + '\u2B07', 'SW' + '\u2B0B', 'W' + '\u2B05', 'NW' + '\u2B09'];
+        const categories = [
+            'N'  + '<i class="bi bi-arrow-up"></i>',
+            'NE' + '<i class="bi bi-arrow-up-right"></i>',
+            'E'  + '<i class="bi bi-arrow-right"></i>',
+            'SE' + '<i class="bi bi-arrow-down-right"></i>',
+            'S'  + '<i class="bi bi-arrow-down"></i>',
+            'SW' + '<i class="bi bi-arrow-down-left"></i>',
+            'W'  + '<i class="bi bi-arrow-left"></i>',
+            'NW' + '<i class="bi bi-arrow-up-left"></i>'];
         $("#latest_wind_dir").html(categories[wind_dir / 45]);
 
         for (const key of Object.keys(json.data)) {
