@@ -44,11 +44,9 @@ function ws_graph(stn) {
         $("#latest_hum").html(json.data[last].Air.RelativeHumidity.Value +"%");
         $("#latest_rain").html(json.data[last].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value +"mm");
         let wind_speed = json.data[last].Wind[0].Speed.Value ? json.data[last].Wind[0].Speed.Value : " --- "
-        let wind_dir = json.data[last].Wind[0].Direction.Value ? json.data[last].Wind[0].Direction.Value : " --- "
+        let wind_dir = json.data[last].Wind[0].Direction.Value != null ? json.data[last].Wind[0].Direction.Value : " --- "
         $("#latest_wind_speed").html(wind_speed +"m/s");
 
-//        const categories = ['N' + '\u2B06', 'NE' + '\u2B08', 'E' + '\u2B95', 'SE' + '\u2B0A',
-//                            'S' + '\u2B07', 'SW' + '\u2B0B', 'W' + '\u2B05', 'NW' + '\u2B09'];
         const categories = [
             'N'  + '<i class="bi bi-arrow-up"></i>',
             'NE' + '<i class="bi bi-arrow-up-right"></i>',
