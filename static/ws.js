@@ -48,14 +48,15 @@ function ws_graph(stn) {
         $("#latest_wind_speed").html(wind_speed +"m/s");
 
         const categories = [
-            'N'  + '<i class="bi bi-arrow-up"></i>',
-            'NE' + '<i class="bi bi-arrow-up-right"></i>',
-            'E'  + '<i class="bi bi-arrow-right"></i>',
-            'SE' + '<i class="bi bi-arrow-down-right"></i>',
-            'S'  + '<i class="bi bi-arrow-down"></i>',
-            'SW' + '<i class="bi bi-arrow-down-left"></i>',
-            'W'  + '<i class="bi bi-arrow-left"></i>',
-            'NW' + '<i class="bi bi-arrow-up-left"></i>'];
+            'N'  + '<i class="bi bi-arrow-down"></i>',
+            'NE' + '<i class="bi bi-arrow-down-left"></i>',
+            'E'  + '<i class="bi bi-arrow-left"></i>',
+            'SE' + '<i class="bi bi-arrow-up-left"></i>',
+            'S'  + '<i class="bi bi-arrow-up"></i>',
+            'SW' + '<i class="bi bi-arrow-up-right"></i>',
+            'W'  + '<i class="bi bi-arrow-right"></i>',
+            'NW' + '<i class="bi bi-arrow-down-right"></i>'];
+
         $("#latest_wind_dir").html(categories[wind_dir / 45]);
 
         for (const key of Object.keys(json.data)) {
