@@ -190,10 +190,10 @@ if __name__ == "__main__":
                     msr.add(data)
                     event_id = msg.id if msg.id else event_id
 
-        except ConnectionResetError:
+        except (ConnectionResetError, ConnectionError) as err:
             if event_id:
                 url = sse_url + "&lasteventid=" + event_id
             else:
                 url = sse_url
-            logger.info("Connection reset, re-establish: {}".format(url))
+            logger.info("Connection reset ({}), re-establish: {}".format(err, url))
             messages = SSEClient(url)
