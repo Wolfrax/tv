@@ -31,9 +31,17 @@ to `lasteventid` to re-establish the connection.
 
 A typical frequency of new data is every 10 minute (but might vary between stations).
 
-# Plotting
-This implementation use [matplotlib](https://matplotlib.org/index.html), partly for training purposes.
-The windrose plotting use [python-windrose](https://github.com/python-windrose/windrose) for convience.
+# UI
+The frontend (webpage) uses [bootstrap](https://getbootstrap.com/) and [highcharts](https://www.highcharts.com/) to
+display data.
 
-As plotting is made recurrently, every time new data is available, matplot memory needs to be released. For this purpose
-I use do the plotting in a seprate process that is started/terminated for each plotting instance.
+`ws_emitter.py` is the server process, using flask and templates to generate HTML. At a request to Index ("/"), flask 
+render the template `ws.html`, which in turn extend `base.html`. These libraries are loaded:
+
+* bootstrap and bootstrap-icons
+* jQuery dataTables
+* highcharts and highcharts windbarb
+* D3
+
+Layout of UI is done through bootstrap, plotting through highcharts and a table of data through jQuery.
+Special care is taken to draw a windrose, D3 is used to create the bins for the histogram used as input for the Windrose.
