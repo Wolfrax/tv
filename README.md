@@ -8,7 +8,7 @@ an [Open API](https://api.trafikinfo.trafikverket.se/).
 This implementation reads data from selected station recurrently (when new data is produced), store into a file and
 produces some plots as png-files and an HTML-file. The implementation store and plot 24 hours of data at most.
 
-As an example, weather data for station "Lund N" is [here](https://www.viltstigen.se/tv_ws/)
+As an example, weather data for station "Lund N" is [here](https://www.viltstigen.se/tv_ws?stn=Lund)
 
 Any station available can be read by using its name, refer to this [map](https://www.trafikverket.se/trafikinformation/vag/?TrafficType=personalTraffic&map=1%2F606442.17%2F6886316.22%2F&Layers=RoadWeather%2b)
 and zoom in to find the right name.
