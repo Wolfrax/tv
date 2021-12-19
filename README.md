@@ -5,8 +5,8 @@ In Sweden, Trafikverket (Swedish Transport Administration) have a
 road conditions. The primary purpose is to use data for managing of roads, but data is available through
 an [Open API](https://api.trafikinfo.trafikverket.se/).
 
-This implementation reads data from selected station recurrently (when new data is produced), store into a file and
-produces some plots as png-files and an HTML-file. The implementation store and plot 24 hours of data at most.
+This implementation reads data from selected station recurrently (when new data is produced) and store into a file. 
+The implementation store and plot 24 hours of data at most.
 
 As an example, weather data for station "Lund N" is [here](https://www.viltstigen.se/tv_ws?stn=Lund)
 
