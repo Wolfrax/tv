@@ -31,12 +31,12 @@ to `lasteventid` to re-establish the connection.
 
 A typical frequency of new data is every 10 minute (but might vary between stations).
 
-# UI
-The frontend (webpage) uses [bootstrap](https://getbootstrap.com/) and [highcharts](https://www.highcharts.com/) to
+## UI
+The frontend (webpage) use [bootstrap](https://getbootstrap.com/) and [highcharts](https://www.highcharts.com/) to
 display data.
 
 `ws_emitter.py` is the server process, using flask and templates to generate HTML. At a request to Index ("/"), flask 
-render the template `ws.html`, which in turn extend `base.html`. These libraries are loaded:
+render the template `ws.html`. These libraries are loaded:
 
 * bootstrap and bootstrap-icons
 * jQuery dataTables
