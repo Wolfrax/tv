@@ -5,9 +5,9 @@
 __author__ = 'mm'
 
 import json
-import logging
-import os
-from flask import Flask, render_template, request, abort
+from flask import Flask, request, abort, jsonify, render_template
+import requests
+import uritemplate
 
 
 class ReverseProxied(object):
@@ -35,6 +35,39 @@ def emit():
         obs = json.load(f)
 
     return {'data': obs} if ind == '' else {'data': obs[int(ind):]}
+
+
+def par_filter(lst, par):
+    return next(item for item in lst['parameters'] if item['name'] == par)['values'][0]
+
+
+@app.route('/_fc')
+def fc():
+    lat = request.args.get('lat', '')
+    lon = request.args.get('lon', '')
+
+    if lat == '' or lon == '':
+        abort(404, description="Resource not found")
+    else:
+        site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+
+        data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
+        try:
+            # "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+            data = requests.get(data_url).json()
+            res = []
+            for par in data['timeSeries']:
+                res.append({'time': par['validTime'],
+                            'temp': par_filter(par, 't'),
+                            'hum': par_filter(par, 'r'),
+                            'rain': par_filter(par, 'pmax'),
+                            'wind_speed': par_filter(par, 'ws'),
+                            'wind_dir': par_filter(par, 'wd'),
+                            'wind_max': par_filter(par, 'gust')})
+            return jsonify({'data': res})
+        except requests.HTTPError:
+            print("HTTPError")
+            abort(404, description="Resource not found")
 
 
 @app.route('/')

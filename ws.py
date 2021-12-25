@@ -43,6 +43,7 @@ query = """
     <INCLUDE>Observation.Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value</INCLUDE>
     <INCLUDE>Observation.Aggregated30minutes.Wind.SpeedMax.Value</INCLUDE>
     <INCLUDE>Name</INCLUDE>
+    <INCLUDE>Geometry.WGS84</INCLUDE>
     <FILTER>
         <EQ name="Name" value='""" + stn_name + """' />
     </FILTER>
@@ -144,6 +145,17 @@ class Measurements:
         self._check(head)
 
         self.data.append(head)
+
+        # Ugly, got to be a better way...
+        # WGS84 comes as a string: "POINT(17.75481 59.81604)", first vale longitude, second latitude
+        # Convert into float values by first splitting string on ' ' --> ['POINT', '(17.75481', '59.81604)']
+        # Then split second elem on '(' --> ['', '17.75481'], then take float of second element --> longitude
+        # Same thing for latitude below
+        point = d['RESPONSE']['RESULT'][0]['WeatherMeasurepoint'][0]['Geometry']['WGS84']
+        point_lon = float(point.split(' ')[1].split('(')[1])
+        point_lat = float(point.split(' ')[2].split(')')[0])
+
+        self.data[-1]['geometry'] = {'lon': point_lon, 'lat': point_lat}
 
         with open('ws.json', 'w', encoding='utf-8') as f:
             json.dump(self.data, f, ensure_ascii=False, indent=4)

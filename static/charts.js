@@ -15,7 +15,8 @@ function plot_ws(id, Title, yAx, obs) {
             offset: 40,
             title: {
                 text: 'Time'
-            }
+            },
+            plotLines: [{ value: new Date().getTime(), dashStyle: 'dash', width: 2, color: '#d33'}]
         },
         yAxis: yAx,
         colors: ['#6CF', '#39F', '#06C', '#036', '#000'],
