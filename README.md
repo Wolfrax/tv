@@ -1,4 +1,4 @@
-# TV - reading weather information from Trafikverket
+# TV - reading weather information from Trafikverket and SMHI
 
 In Sweden, Trafikverket (Swedish Transport Administration) have a 
 [country wide network of weather stations](https://www.trafikverket.se/tjanster/trafiktjanster/VViS/) to monitor
@@ -6,12 +6,13 @@ road conditions. The primary purpose is to use data for managing of roads, but d
 an [Open API](https://api.trafikinfo.trafikverket.se/).
 
 This implementation reads data from selected station recurrently (when new data is produced) and store into a file. 
-The implementation store and plot 24 hours of data at most.
+The implementation store and plot 24 hours of data at most. At the same time it reads 
+[progonse data from SMHI](http://opendata.smhi.se/apidocs/metfcst/index.html)
 
 As an example, weather data for station "Lund N" is [here](https://www.viltstigen.se/tv_ws?stn=Lund)
 
 Any station available can be read by using its name, refer to this [map](https://www.trafikverket.se/trafikinformation/vag/?TrafficType=personalTraffic&map=1%2F606442.17%2F6886316.22%2F&Layers=RoadWeather%2b)
-and zoom in to find the right name.
+and zoom in to find the right name. Data from SMHI uses the coordinates from the station.
 
 To use the API, an authorization key is needed, a [registration](https://api.trafikinfo.trafikverket.se/Account/Register)
 is needed (free of charge). The key is available there.
@@ -42,6 +43,8 @@ render the template `ws.html`. These libraries are loaded:
 * jQuery dataTables
 * highcharts and highcharts windbarb
 * D3
+* Leaflet
 
-Layout of UI is done through bootstrap, plotting through highcharts and a table of data through jQuery.
+Layout of UI is done through bootstrap, plotting through highcharts and a table of data through jQuery. Map for
+position of station is done through leaflet.
 Special care is taken to draw a windrose, D3 is used to create the bins for the histogram used as input for the Windrose.
