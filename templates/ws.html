@@ -91,10 +91,26 @@
         </thead>
     </table>
 
+    <h2>Forecast</h2>
+    <table id="fc_data" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Temp</th>
+            <th>Rain</th>
+            <th>Humidity</th>
+            <th>Wind speed</th>
+            <th>Wind speed max</th>
+            <th>Wind direction</th>
+        </tr>
+        </thead>
+    </table>
+
 {% endblock %}
 {% block main %}
     <script>$(document).ready(function () {
         ws_graph('{{ stn }}');
         table('{{ stn }}');
+        fc_table('{{ stn }}');
     });</script>
 {% endblock %}

@@ -21,7 +21,40 @@ function table(stn) {
             {data: 'Aggregated30minutes.Wind.SpeedMax.Value', orderable: false},
             {data: 'Wind[0].Direction.Value', orderable: false}
         ],
-    })
+    });
+}
+
+function fc_table(stn) {
+    $.getJSON('tv_ws/_ws', {stn: stn}, function (json) {
+        $('#fc_data').DataTable({
+            order: [[0, "asc"]],
+            paging: true,
+            searching: false,
+            info: true,
+            pageLength: 25,
+            lengthChange: false,
+            ajax: {
+                'url': 'forecast/_fc',
+                'data': {
+                    'lat': json.data[json.data.length - 1].geometry.lat,
+                    'lon': json.data[json.data.length - 1].geometry.lon,
+                }
+            },
+            columns: [
+                {
+                    data: 'time', 'render': function (val) {
+                        return val.slice(0, 19).replace('T', ' ')
+                    }, orderable: false
+                },
+                {data: 'temp', orderable: false},
+                {data: 'rain', orderable: false},
+                {data: 'hum', orderable: false},
+                {data: 'wind_speed', orderable: false},
+                {data: 'wind_max', orderable: false},
+                {data: 'wind_dir', orderable: false}
+            ],
+        })
+    });
 }
 
 function inRange(x) {
@@ -70,6 +103,7 @@ function ws_graph(stn) {
             wind_barb.push([new Date(json.data[key].Sample).getTime(), json.data[key].Wind[0].Speed.Value, json.data[key].Wind[0].Direction.Value]);
             wind_dirs.push([json.data[key].Wind[0].Direction.Value, json.data[key].Wind[0].Speed.Value]);
         }
+
         let map = L.map('map').setView([json.data[last].geometry.lat, json.data[last].geometry.lon], 14);
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -79,11 +113,11 @@ function ws_graph(stn) {
             zoomOffset: -1,
             accessToken: 'pk.eyJ1IjoiZWNzbWFtZSIsImEiOiJja3hoeWFudDYxODNpMnducHVvc2R3bWQ0In0.XFA2z4SqARYem91PAB_Yag'
         }).addTo(map);
-        var marker = L.marker([json.data[last].geometry.lat, json.data[last].geometry.lon]).addTo(map);
+        let marker = L.marker([json.data[last].geometry.lat, json.data[last].geometry.lon]).addTo(map);
 
         $.getJSON('forecast/_fc', {
             lat: json.data[last].geometry.lat,
-            lon: json.data[last].geometry.lon
+            lon: json.data[last].geometry.lon,
         }, function (json) {
             json.data.forEach(function (elem) {
                 t = new Date(elem.time).getTime();
