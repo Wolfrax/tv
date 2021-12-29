@@ -8,7 +8,7 @@ function plot_ws(id, Title, yAx, obs) {
             text: Title
         },
         subtitle: {
-            text: 'Last 24 hours'
+            text: 'Last 24 hours + forecast'
         },
         xAxis: {
             type: 'datetime',
@@ -37,7 +37,7 @@ function plot_rose(obs, id, Title) {
                 text: Title
             },
             subtitle: {
-                text: 'Last 24 hours'
+                text: 'Last 24 hours + forecast'
             },
             legend: {
                 align: 'right',
