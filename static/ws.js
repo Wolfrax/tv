@@ -38,7 +38,11 @@ function fc_table(stn) {
                 'data': {
                     'lat': json.data[json.data.length - 1].geometry.lat,
                     'lon': json.data[json.data.length - 1].geometry.lon,
-                }
+                },
+                'dataSrc': function (json) {
+                    json.data.shift();  // Remove first element
+                    return json.data;
+                },
             },
             columns: [
                 {
@@ -119,6 +123,8 @@ function ws_graph(stn) {
             lat: json.data[last].geometry.lat,
             lon: json.data[last].geometry.lon,
         }, function (json) {
+            json.data.shift();  // Remove first element
+
             json.data.forEach(function (elem) {
                 t = new Date(elem.time).getTime();
                 temps.push([t, elem.temp]);
