@@ -24,6 +24,11 @@ function table(stn) {
     });
 }
 
+// https://stackoverflow.com/a/40785593
+Date.prototype.getUTCTime = function () {
+    return this.getTime() - (this.getTimezoneOffset() * 60000);
+};
+
 function fc_table(stn) {
     $.getJSON('tv_ws/_ws', {stn: stn}, function (json) {
         $('#fc_data').DataTable({
@@ -40,7 +45,13 @@ function fc_table(stn) {
                     'lon': json.data[json.data.length - 1].geometry.lon,
                 },
                 'dataSrc': function (json) {
-                    json.data.shift();  // Remove first element
+                    // Remove all elements in forecat that is older than 'now'
+                    let now = new Date().getUTCTime();
+                    json.data.forEach(elem => {
+                        if (new Date(elem.time).getTime() <= now) {
+                            json.data.shift();
+                        }
+                    });
                     return json.data;
                 },
             },
@@ -123,7 +134,13 @@ function ws_graph(stn) {
             lat: json.data[last].geometry.lat,
             lon: json.data[last].geometry.lon,
         }, function (json) {
-            json.data.shift();  // Remove first element
+            // Remove all elements in forecat that is older than 'now'
+            let now = new Date().getUTCTime();
+            json.data.forEach(elem => {
+                if (new Date(elem.time).getTime() <= now) {
+                    json.data.shift();
+                }
+            });
 
             json.data.forEach(function (elem) {
                 t = new Date(elem.time).getTime();
