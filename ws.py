@@ -104,9 +104,9 @@ class Measurements:
         if 'Aggregated30minutes' not in msr:
             msr['Aggregated30minutes'] = {}
         if 'Wind' not in msr['Aggregated30minutes']:
-            msr['Aggregated30minutes']['Wind'] = {'SpeedMax': {'Value': 0}}
+            msr['Aggregated30minutes']['Wind'] = {'SpeedMax': {'Value': None}}
         if 'SpeedMax' not in msr['Aggregated30minutes']['Wind']:
-            msr['Aggregated30minutes']['Wind']['SpeedMax'] = {'Value': 0}
+            msr['Aggregated30minutes']['Wind']['SpeedMax'] = {'Value': None}
 
         if 'Precipitation' not in msr:
             msr['Precipitation'] = {}

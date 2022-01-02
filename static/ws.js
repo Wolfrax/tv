@@ -113,10 +113,18 @@ function ws_graph(stn) {
             temps.push([new Date(json.data[key].Sample).getTime(), json.data[key].Air.Temperature.Value]);
             hums.push([new Date(json.data[key].Sample).getTime(), json.data[key].Air.RelativeHumidity.Value]);
             rain.push([new Date(json.data[key].Sample).getTime(), json.data[key].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value]);
-            wind.push([new Date(json.data[key].Sample).getTime(), json.data[key].Wind[0].Speed.Value]);
-            wind_max.push([new Date(json.data[key].Sample).getTime(), json.data[key].Aggregated30minutes.Wind.SpeedMax.Value]);
-            wind_barb.push([new Date(json.data[key].Sample).getTime(), json.data[key].Wind[0].Speed.Value, json.data[key].Wind[0].Direction.Value]);
-            wind_dirs.push([json.data[key].Wind[0].Direction.Value, json.data[key].Wind[0].Speed.Value]);
+            if (json.data[key].Wind[0].Speed.Value) {
+                wind.push([new Date(json.data[key].Sample).getTime(), json.data[key].Wind[0].Speed.Value]);
+            }
+            if (json.data[key].Aggregated30minutes.Wind.SpeedMax.Value) {
+                wind_max.push([new Date(json.data[key].Sample).getTime(), json.data[key].Aggregated30minutes.Wind.SpeedMax.Value]);
+            }
+            if (json.data[key].Wind[0].Speed.Value && json.data[key].Wind[0].Direction.Value) {
+                wind_barb.push([new Date(json.data[key].Sample).getTime(), json.data[key].Wind[0].Speed.Value, json.data[key].Wind[0].Direction.Value]);
+            }
+            if (json.data[key].Wind[0].Speed.Value) {
+                wind_dirs.push([json.data[key].Wind[0].Direction.Value, json.data[key].Wind[0].Speed.Value]);
+            }
         }
 
         let map = L.map('map').setView([json.data[last].geometry.lat, json.data[last].geometry.lon], 14);
