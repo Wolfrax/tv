@@ -1,3 +1,9 @@
+Highcharts.setOptions({
+    time: {
+        timezone: 'Europe/Stockholm'
+    }
+});
+
 function plot_ws(id, Title, yAx, obs) {
     Highcharts.chart(id, {
         chart: {
