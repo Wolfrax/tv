@@ -1,4 +1,36 @@
-function table(stn) {
+// weather data is collected to the weather_data object,
+//   actual from trafikverket
+//   forecast from SMHI
+//   concat is a flag, indicating if actual and forecast data should be concatenated
+
+let weather_data = {
+    actual: {
+        temp: [],
+        hum: [],
+        rain: [],
+        wind: [],
+        wind_max: [],
+        wind_barb: [],
+        wind_dir: [],
+        first_sample: "",
+        last_sample: "",
+    },
+    forecast: {
+        temp: [],
+        hum: [],
+        rain: [],
+        wind: [],
+        wind_max: [],
+        wind_barb: [],
+        wind_dir: [],
+        first_sample: "",
+        last_sample: "",
+    },
+    concat: true,
+};
+
+function table_actual(stn) {
+    // Make a table for actual values, 1 hour (7 indexes, data logged every 10th minute)
     $('#data').DataTable({
         order: [[0, "desc"]],
         paging: false,
@@ -29,7 +61,7 @@ Date.prototype.getUTCTime = function () {
     return this.getTime() - (this.getTimezoneOffset() * 60000);
 };
 
-function fc_table(stn) {
+function table_forecast(stn) {
     $.getJSON('tv_ws/_ws', {stn: stn}, function (json) {
         $('#fc_data').DataTable({
             order: [[0, "asc"]],
@@ -72,68 +104,43 @@ function fc_table(stn) {
     });
 }
 
-function inRange(x) {
-    return this[0] <= x[0] && x[0] < this[1]
-}
-
-function forecast_plot() {
-    plot_data.concat = !plot_data.concat;
+function concat() {
+    // Toggle flag and redo plotting
+    weather_data.concat = !weather_data.concat;
     plot();
 }
 
-let plot_data = {
-    actual: {
-        temps: [],
-        hums: [],
-        rain: [],
-        wind: [],
-        wind_max: [],
-        wind_barb: [],
-        wind_dirs: [],
-        first_sample: "",
-        last_sample: "",
-    },
-    forecast: {
-        temps: [],
-        hums: [],
-        rain: [],
-        wind: [],
-        wind_max: [],
-        wind_barb: [],
-        wind_dirs: [],
-        first_sample: "",
-        last_sample: "",
-    },
-    concat: true,
-};
-
 function plot() {
+    function inRange(x) {
+        return this[0] <= x[0] && x[0] < this[1]
+    }
+
     let temps, hums, rain, wind, wind_max, wind_barb, wind_dirs;
     let rain_cum = [];
     let latest_time;
 
-    if (plot_data.concat) {
+    if (weather_data.concat) {
         // concatenate actual with forecasted values
-        temps = plot_data.actual.temps.concat(plot_data.forecast.temps);
-        hums = plot_data.actual.hums.concat(plot_data.forecast.hums);
-        rain = plot_data.actual.rain.concat(plot_data.forecast.rain);
-        wind = plot_data.actual.wind.concat(plot_data.forecast.wind);
-        wind_max = plot_data.actual.wind_max.concat(plot_data.forecast.wind_max);
-        wind_barb = plot_data.actual.wind_barb.concat(plot_data.forecast.wind_barb);
-        wind_dirs = plot_data.actual.wind_dirs.concat(plot_data.forecast.wind_dirs);
-        latest_time = new Date(plot_data.actual.first_sample).toLocaleString("SWE") + " to " +
-            plot_data.forecast.last_sample
+        temps = weather_data.actual.temp.concat(weather_data.forecast.temp);
+        hums = weather_data.actual.hum.concat(weather_data.forecast.hum);
+        rain = weather_data.actual.rain.concat(weather_data.forecast.rain);
+        wind = weather_data.actual.wind.concat(weather_data.forecast.wind);
+        wind_max = weather_data.actual.wind_max.concat(weather_data.forecast.wind_max);
+        wind_barb = weather_data.actual.wind_barb.concat(weather_data.forecast.wind_barb);
+        wind_dirs = weather_data.actual.wind_dir.concat(weather_data.forecast.wind_dir);
+        latest_time = new Date(weather_data.actual.first_sample).toLocaleString("SWE") + " to " +
+            weather_data.forecast.last_sample
     } else {
         // Use only actual, make a copy
-        temps = plot_data.actual.temps.slice();
-        hums = plot_data.actual.hums.slice();
-        rain = plot_data.actual.rain.slice();
-        wind = plot_data.actual.wind.slice();
-        wind_max = plot_data.actual.wind_max.slice();
-        wind_barb = plot_data.actual.wind_barb.slice();
-        wind_dirs = plot_data.actual.wind_dirs.slice();
-        latest_time = new Date(plot_data.actual.first_sample).toLocaleString("SWE") + " to " +
-            new Date(plot_data.actual.last_sample).toLocaleString("SWE")
+        temps = weather_data.actual.temp.slice();
+        hums = weather_data.actual.hum.slice();
+        rain = weather_data.actual.rain.slice();
+        wind = weather_data.actual.wind.slice();
+        wind_max = weather_data.actual.wind_max.slice();
+        wind_barb = weather_data.actual.wind_barb.slice();
+        wind_dirs = weather_data.actual.wind_dir.slice();
+        latest_time = new Date(weather_data.actual.first_sample).toLocaleString("SWE") + " to " +
+            new Date(weather_data.actual.last_sample).toLocaleString("SWE")
     }
 
     $("#latest_time").html(latest_time);
@@ -145,10 +152,46 @@ function plot() {
     $("#latest_cum_rain").html("\u03A3" + rain_cum[rain_cum.length - 1][1] + "mm");
 
     plot_ws('ws_temp', 'Temperature & Humidity',
-        [{title: {text: 'Temperature (°C)'}}, {title: {text: 'Humidity (%)'}, opposite: true}],
         [
-            {yAxis: 1, name: 'Humidity', data: hums, color: '#6CF', tooltip: {valueSuffix: '%'}},
-            {yAxis: 0, name: 'Temperature', data: temps, color: 'gray', tooltip: {valueSuffix: '°C'}}
+            {
+                title: {
+                    text: 'Temperature (°C)',
+                    style: {color: 'gray'}
+                },
+                labels: {
+                    style: {color: 'gray'}
+                },
+                lineWidth: 2,
+                lineColor: 'gray',
+            },
+            {
+                title: {
+                    text: 'Humidity (%)',
+                    style: {color: '#6CF'}
+                },
+                labels: {
+                    style: {color: '#6CF'}
+                },
+                lineWidth: 2,
+                lineColor: '#6CF',
+                opposite: true,
+            }
+        ],
+        [
+            {
+                yAxis: 0,
+                name: 'Temperature',
+                data: temps,
+                color: 'gray',
+                tooltip: {valueSuffix: '°C'},
+            },
+            {
+                yAxis: 1,
+                name: 'Humidity',
+                data: hums,
+                color: '#6CF',
+                tooltip: {valueSuffix: '%'},
+            },
         ],
     );
 
@@ -213,7 +256,8 @@ function plot() {
 
 }
 
-function ws_graph(stn) {
+function getData_plot(stn) {
+    // First get weather data from trafikverket station
     $.getJSON('tv_ws/_ws', {stn: stn}, function (json) {
         let last = json.data.length - 1
 
@@ -236,27 +280,32 @@ function ws_graph(stn) {
 
         $("#latest_wind_dir").html(categories[wind_dir / 45]);
 
-        plot_data.actual.first_sample = json.data[0].Sample;
-        plot_data.actual.last_sample = json.data[last].Sample;
+        // Now fill weather_data object with actual values
+        weather_data.actual.first_sample = json.data[0].Sample;
+        weather_data.actual.last_sample = json.data[last].Sample;
+
         for (const key of Object.keys(json.data)) {
             t = new Date(json.data[key].Sample).getTime();
-            plot_data.actual.temps.push([t, json.data[key].Air.Temperature.Value]);
-            plot_data.actual.hums.push([t, json.data[key].Air.RelativeHumidity.Value]);
-            plot_data.actual.rain.push([t, json.data[key].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value]);
+            weather_data.actual.temp.push([t, json.data[key].Air.Temperature.Value]);
+            weather_data.actual.hum.push([t, json.data[key].Air.RelativeHumidity.Value]);
+            weather_data.actual.rain.push([t, json.data[key].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value]);
+
+            // Below values are tested for null, this might occur as some stations doesn't measure wind
             if (json.data[key].Wind[0].Speed.Value) {
-                plot_data.actual.wind.push([t, json.data[key].Wind[0].Speed.Value]);
+                weather_data.actual.wind.push([t, json.data[key].Wind[0].Speed.Value]);
             }
             if (json.data[key].Aggregated30minutes.Wind.SpeedMax.Value) {
-                plot_data.actual.wind_max.push([t, json.data[key].Aggregated30minutes.Wind.SpeedMax.Value]);
+                weather_data.actual.wind_max.push([t, json.data[key].Aggregated30minutes.Wind.SpeedMax.Value]);
             }
             if (json.data[key].Wind[0].Speed.Value && json.data[key].Wind[0].Direction.Value) {
-                plot_data.actual.wind_barb.push([t, json.data[key].Wind[0].Speed.Value, json.data[key].Wind[0].Direction.Value]);
+                weather_data.actual.wind_barb.push([t, json.data[key].Wind[0].Speed.Value, json.data[key].Wind[0].Direction.Value]);
             }
             if (json.data[key].Wind[0].Speed.Value) {
-                plot_data.actual.wind_dirs.push([json.data[key].Wind[0].Direction.Value, json.data[key].Wind[0].Speed.Value]);
+                weather_data.actual.wind_dir.push([json.data[key].Wind[0].Direction.Value, json.data[key].Wind[0].Speed.Value]);
             }
         }
 
+        // Draw a map, and put a marker for the station
         let map = L.map('map').setView([json.data[last].geometry.lat, json.data[last].geometry.lon], 14);
         L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
             attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -268,11 +317,12 @@ function ws_graph(stn) {
         }).addTo(map);
         L.marker([json.data[last].geometry.lat, json.data[last].geometry.lon]).addTo(map);
 
+        // Now get forecast data from SMHI
         $.getJSON('forecast/_fc', {
             lat: json.data[last].geometry.lat,
             lon: json.data[last].geometry.lon,
         }, function (json) {
-            // Remove all elements in forecast that is older than 'now'
+            // Remove all elements in forecast that is older than 'now', thus avoiding overlap with actual
             let now = new Date().getUTCTime();
             json.data.forEach(elem => {
                 if (new Date(elem.time).getTime() <= now) {
@@ -280,17 +330,19 @@ function ws_graph(stn) {
                 }
             });
 
-            plot_data.forecast.first_sample = json.data[0].time.slice(0, 19).replace('T', ' ');
-            plot_data.forecast.last_sample = json.data[json.data.length - 1].time.slice(0, 19).replace('T', ' ');
+            // Now fill weather_data object with forecast values
+            weather_data.forecast.first_sample = json.data[0].time.slice(0, 19).replace('T', ' ');
+            weather_data.forecast.last_sample = json.data[json.data.length - 1].time.slice(0, 19).replace('T', ' ');
+
             json.data.forEach(function (elem) {
-                t = new Date(elem.time).getTime();
-                plot_data.forecast.temps.push([t, elem.temp]);
-                plot_data.forecast.hums.push([t, elem.hum]);
-                plot_data.forecast.rain.push([t, elem.rain]);
-                plot_data.forecast.wind.push([t, elem.wind_speed]);
-                plot_data.forecast.wind_max.push([t, elem.wind_max]);
-                plot_data.forecast.wind_barb.push([t, elem.wind_speed, elem.wind_dir]);
-                plot_data.forecast.wind_dirs.push([elem.wind_dir, elem.wind_speed]);
+                let t = new Date(elem.time).getTime();
+                weather_data.forecast.temp.push([t, elem.temp]);
+                weather_data.forecast.hum.push([t, elem.hum]);
+                weather_data.forecast.rain.push([t, elem.rain]);
+                weather_data.forecast.wind.push([t, elem.wind_speed]);
+                weather_data.forecast.wind_max.push([t, elem.wind_max]);
+                weather_data.forecast.wind_barb.push([t, elem.wind_speed, elem.wind_dir]);
+                weather_data.forecast.wind_dir.push([elem.wind_dir, elem.wind_speed]);
             });
 
             plot();

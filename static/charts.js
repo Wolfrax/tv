@@ -8,7 +8,48 @@ function plot_ws(id, Title, yAx, obs) {
     Highcharts.chart(id, {
         chart: {
             type: 'spline',
-            shadow: true
+            shadow: true,
+            events: {
+                load: function () {
+                    var chart = this,
+                        points = chart.series[0].points,
+                        minValue, maxValue,
+                        chosenMinPoint, chosenMaxPoint;
+
+                    points.forEach(function (point, index) {
+                        if (!minValue || minValue > point.y) {
+                            minValue = point.y;
+                            chosenMinPoint = point;
+                        }
+                    });
+
+                    points.forEach(function (point, index) {
+                        if (!maxValue || maxValue < point.y) {
+                            maxValue = point.y;
+                            chosenMaxPoint = point;
+                        }
+                    });
+
+                    chosenMinPoint.update({
+                        marker: {
+                            enabled: true,
+                        },
+                        dataLabels: {
+                            enabled: true,
+                        },
+                    });
+
+                    chosenMaxPoint.update({
+                        marker: {
+                            enabled: true,
+                        },
+                        dataLabels: {
+                            enabled: true,
+                        },
+                    });
+                }
+            }
+
         },
         title: {
             text: Title
@@ -22,7 +63,7 @@ function plot_ws(id, Title, yAx, obs) {
             title: {
                 text: 'Time'
             },
-            plotLines: [{ value: new Date().getTime(), dashStyle: 'dash', width: 2, color: '#d33'}]
+            plotLines: [{value: new Date().getTime(), dashStyle: 'dash', width: 2, color: '#d33'}]
         },
         yAxis: yAx,
         colors: ['#6CF', '#39F', '#06C', '#036', '#000'],

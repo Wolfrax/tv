@@ -54,7 +54,7 @@
 
     <div class="row">
         <div class="col-sm-12 m-lg-2 p-lg-2">
-            <input type="checkbox" id="fc_check" onclick="forecast_plot()" checked>
+            <input type="checkbox" id="fc_check" onclick="concat()" checked>
             <label for="fc_check">Include forecast in graphs</label>
         </div>
     </div>
@@ -112,8 +112,8 @@
 {% endblock %}
 {% block main %}
     <script>$(document).ready(function () {
-        ws_graph('{{ stn }}');
-        table('{{ stn }}');
-        fc_table('{{ stn }}');
+        getData_plot('{{ stn }}');
+        table_actual('{{ stn }}');
+        table_forecast('{{ stn }}');
     });</script>
 {% endblock %}
