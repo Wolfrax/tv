@@ -59,7 +59,7 @@ function plot_ws(id, Title, yAx, obs) {
             text: Title
         },
         subtitle: {
-            text: 'Last 24 hours + forecast'
+            text: weather_data.concat ? 'Last 24 hours + forecast' : 'Last 24 hours'
         },
         xAxis: {
             type: 'datetime',
