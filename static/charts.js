@@ -30,23 +30,27 @@ function plot_ws(id, Title, yAx, obs) {
                         }
                     });
 
-                    chosenMinPoint.update({
-                        marker: {
-                            enabled: true,
-                        },
-                        dataLabels: {
-                            enabled: true,
-                        },
-                    });
+                    if (chosenMinPoint) {
+                        chosenMinPoint.update({
+                            marker: {
+                                enabled: true,
+                            },
+                            dataLabels: {
+                                enabled: true,
+                            },
+                        });
+                    }
 
-                    chosenMaxPoint.update({
-                        marker: {
-                            enabled: true,
-                        },
-                        dataLabels: {
-                            enabled: true,
-                        },
-                    });
+                    if (chosenMaxPoint) {
+                        chosenMaxPoint.update({
+                            marker: {
+                                enabled: true,
+                            },
+                            dataLabels: {
+                                enabled: true,
+                            },
+                        });
+                    }
                 }
             }
 
