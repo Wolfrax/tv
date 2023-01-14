@@ -15,6 +15,7 @@ import warnings
 from logging.handlers import RotatingFileHandler
 import sys
 import sdnotify
+from logging.handlers import HTTPHandler
 
 
 warnings.filterwarnings("ignore", category=UserWarning)
@@ -28,8 +29,6 @@ if len(sys.argv) == 1:
     stn_name = "Lund N"
 else:
     stn_name = sys.argv[1]
-
-print("Station: {}".format(stn_name))
 
 query = """
 <REQUEST>
@@ -173,14 +172,16 @@ if __name__ == "__main__":
     handler.setLevel(logging.DEBUG)
     logger.addHandler(handler)
 
-    # In case of loggin to /var/log/syslog
+    http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
+    logger.addHandler(http_handler)
+
+    # In case of logging to /var/log/syslog
     # handler = logging.handlers.SysLogHandler(address='/dev/log')
     # handler.setFormatter(formatter)
     # handler.setLevel(logging.DEBUG)
     # logger.addHandler(handler)
 
-    logger.info("Start v2.0")
-    logger.info("Station: {}".format(stn_name))
+    logger.info("Start v2.0 - {}".format(stn_name))
 
     r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
     sse_url = r['RESPONSE']['RESULT'][0]['INFO']['SSEURL']

@@ -5,9 +5,18 @@
 __author__ = 'mm'
 
 import json
+import logging
+
 from flask import Flask, request, abort, jsonify, render_template
 import requests
 import uritemplate
+from logging.handlers import HTTPHandler
+
+_LOGGER = logging.getLogger(__name__)
+_LOGGER.setLevel(logging.DEBUG)
+
+http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
+_LOGGER.addHandler(http_handler)
 
 
 class ReverseProxied(object):
@@ -66,7 +75,7 @@ def fc():
                             'wind_max': par_filter(par, 'gust')})
             return jsonify({'data': res})
         except requests.HTTPError:
-            print("HTTPError")
+            logging.warning("HTTPError")
             abort(404, description="Resource not found")
 
 
