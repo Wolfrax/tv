@@ -16,7 +16,9 @@ from logging.handlers import RotatingFileHandler
 import sys
 import sdnotify
 from logging.handlers import HTTPHandler
-
+import os
+import shutil
+import signal
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -54,6 +56,9 @@ query = """
 class Measurements:
     def __init__(self):
         self.data = []
+
+        signal.signal(signal.SIGHUP, self.terminate)
+        signal.signal(signal.SIGTERM, self.terminate)
 
         try:
             with open('ws.json', 'r', encoding='utf-8') as f:
@@ -146,7 +151,7 @@ class Measurements:
         self.data.append(head)
 
         # Ugly, got to be a better way...
-        # WGS84 comes as a string: "POINT(17.75481 59.81604)", first vale longitude, second latitude
+        # WGS84 comes as a string: "POINT(17.75481 59.81604)", first value longitude, second latitude
         # Convert into float values by first splitting string on ' ' --> ['POINT', '(17.75481', '59.81604)']
         # Then split second elem on '(' --> ['', '17.75481'], then take float of second element --> longitude
         # Same thing for latitude below
@@ -155,10 +160,24 @@ class Measurements:
         point_lat = float(point.split(' ')[2].split(')')[0])
 
         self.data[-1]['geometry'] = {'lon': point_lon, 'lat': point_lat}
+        self._save()
 
-        with open('ws.json', 'w', encoding='utf-8') as f:
+    def _save(self):
+        # First save to a temporary file, then save a backup of original file, then move the tmp-file to target
+        fn = 'ws.json'
+        with open(fn + '_tmp', 'w', encoding='utf-8') as f:
             json.dump(self.data, f, ensure_ascii=False, indent=4)
             f.flush()
+
+        if os.path.exists(fn):
+            shutil.move(fn, fn + '_bck')
+
+        if os.path.exists(fn + '_tmp'):
+            shutil.move(fn + '_tmp', fn)
+
+    def terminate(self):
+        self._save()
+        sys.exit(0)
 
 
 if __name__ == "__main__":
