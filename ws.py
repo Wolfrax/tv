@@ -228,4 +228,8 @@ if __name__ == "__main__":
             else:
                 url = sse_url
             logger.info("Connection reset ({}), re-establish: {}".format(err, url))
-            messages = SSEClient(url)
+            try:
+                messages = SSEClient(url)
+            except requests.exceptions.HTTPError as err:
+                logger.info("HTTP error: {}, reconnect using {}".format(err, sse_url))
+                messages = SSEClient(sse_url)
