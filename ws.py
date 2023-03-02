@@ -202,7 +202,12 @@ if __name__ == "__main__":
 
     logger.info("Start v2.0 - {}".format(stn_name))
 
-    r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
+    try:
+        r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
+    except json.decoder.JSONDecodeError as err:
+        logger.info("Error connecting to {}".format(url))
+        sys.exit(0)
+
     sse_url = r['RESPONSE']['RESULT'][0]['INFO']['SSEURL']
     logger.info("Streaming URL: {}".format(sse_url))
 
