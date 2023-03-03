@@ -213,12 +213,15 @@ if __name__ == "__main__":
 
     msr = Measurements()
 
-    messages = SSEClient(sse_url)
+    messages = None
     event_id = None
+    url = sse_url
 
     dog = sdnotify.SystemdNotifier()
 
     while True:
+        if messages is None:
+            messages = SSEClient(url)
         try:
             for msg in messages:
                 dog.notify("WATCHDOG=1")
@@ -227,14 +230,11 @@ if __name__ == "__main__":
                     msr.add(data)
                     event_id = msg.id if msg.id else event_id
 
-        except (ConnectionResetError, ConnectionError) as err:
+        except (ConnectionResetError, requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as err:
             if event_id:
                 url = sse_url + "&lasteventid=" + event_id
             else:
                 url = sse_url
             logger.info("Connection reset ({}), re-establish: {}".format(err, url))
-            try:
-                messages = SSEClient(url)
-            except requests.exceptions.HTTPError as err:
-                logger.info("HTTP error: {}, reconnect using {}".format(err, sse_url))
-                messages = SSEClient(sse_url)
+            messages = None
+            continue
