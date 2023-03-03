@@ -204,7 +204,7 @@ if __name__ == "__main__":
 
     try:
         r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
-    except json.decoder.JSONDecodeError as err:
+    except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError) as err:
         logger.info("Error connecting to {}".format(url))
         sys.exit(0)
 
