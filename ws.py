@@ -19,6 +19,7 @@ from logging.handlers import HTTPHandler
 import os
 import shutil
 import signal
+import time
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -220,9 +221,10 @@ if __name__ == "__main__":
     dog = sdnotify.SystemdNotifier()
 
     while True:
-        if messages is None:
-            messages = SSEClient(url)
         try:
+            if messages is None:
+                messages = SSEClient(url)
+
             for msg in messages:
                 dog.notify("WATCHDOG=1")
                 if msg.data:
@@ -237,4 +239,5 @@ if __name__ == "__main__":
                 url = sse_url
             logger.info("Connection reset ({}), re-establish: {}".format(err, url))
             messages = None
+            time.sleep(300) # sleep for 5 min, 300 sec, before trying to reconnect
             continue
