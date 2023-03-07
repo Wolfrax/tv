@@ -183,7 +183,7 @@ class Measurements:
 
 if __name__ == "__main__":
     logger = logging.getLogger("tv_ws log")
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
     # add a rotating handler, max 10MB
     handler = RotatingFileHandler('ws.log', maxBytes=1048576, backupCount=5)
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     try:
         r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
     except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError) as err:
-        logger.info("Error connecting to {}".format(url))
+        logger.error("Error connecting to {}".format(url))
         sys.exit(0)
 
     sse_url = r['RESPONSE']['RESULT'][0]['INFO']['SSEURL']
@@ -237,7 +237,7 @@ if __name__ == "__main__":
                 url = sse_url + "&lasteventid=" + event_id
             else:
                 url = sse_url
-            logger.info("Connection reset ({}), re-establish: {}".format(err, url))
+            logger.debug("Connection reset ({}), re-establish: {}".format(err, url))
             messages = None
             time.sleep(300) # sleep for 5 min, 300 sec, before trying to reconnect
             continue
