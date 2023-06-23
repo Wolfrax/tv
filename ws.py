@@ -217,6 +217,7 @@ if __name__ == "__main__":
     messages = None
     event_id = None
     url = sse_url
+    msg_cnt = 0
 
     dog = sdnotify.SystemdNotifier()
 
@@ -231,6 +232,12 @@ if __name__ == "__main__":
                     data = json.loads(msg.data)
                     msr.add(data)
                     event_id = msg.id if msg.id else event_id
+                    msg_cnt = 0
+                else:
+                    msg_cnt += 1
+                    if msg_cnt == 200:
+                        logger.warning(f"TV: {stn_name}, empty msg: {msg_cnt}")
+                        msg_cnt = 0
 
         except (ConnectionResetError, requests.exceptions.ConnectionError, requests.exceptions.HTTPError) as err:
             if event_id:
