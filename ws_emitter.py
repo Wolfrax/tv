@@ -87,6 +87,8 @@ def index():
         abort(404, description="Resource not found")
     elif stn == 'Lund':
         return render_template('ws.html', stn=stn, title='Weather Lund N')
+    elif stn == 'Karlshamn':
+        return render_template('ws.html', stn=stn, title='Weather Karlshamn')
     elif stn == 'Ralla':
         return render_template('ws.html', stn=stn, title='Weather Öland Rälla')
     elif stn == 'Uppsala':

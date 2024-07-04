@@ -29,7 +29,7 @@ auth_key = conf['auth']['key']
 url = "https://api.trafikinfo.trafikverket.se/v2/data.json"
 
 if len(sys.argv) == 1:
-    stn_name = "Lund N"
+    stn_name = "Gårdstånga" # "Lund N"
 else:
     stn_name = sys.argv[1]
 
