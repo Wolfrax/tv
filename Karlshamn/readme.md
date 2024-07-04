@@ -1,2 +1,2 @@
 Don't forget
-$ ln -s ../auth.yml auth.yml
+$ ln -s ../auth.yml auth.yml 
