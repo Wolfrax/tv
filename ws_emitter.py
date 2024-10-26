@@ -11,6 +11,7 @@ from flask import Flask, request, abort, jsonify, render_template
 import requests
 import uritemplate
 from logging.handlers import HTTPHandler
+from dateutil import parser
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -42,8 +43,17 @@ def emit():
 
     with open(stn + '/ws.json') as f:
         obs = json.load(f)
-
-    return {'data': obs} if ind == '' else {'data': obs[int(ind):]}
+        if ind == '':  # Return full series
+            return {'data': obs}
+        elif int(ind) < 0:  # Return last ind items
+            return {'data': obs[int(ind):]}
+        else:  # Return last ind hours
+            last_dt = parser.parse(obs[-1]['Sample'])
+            i = 0
+            for item in obs:
+                if (last_dt - parser.parse(item['Sample'])).total_seconds() <= int(ind) * 60 * 60:
+                    i-= 1
+            return {'data': obs[i:]}
 
 
 def par_filter(lst, par):

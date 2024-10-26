@@ -30,7 +30,7 @@ let weather_data = {
 };
 
 function table_actual(stn) {
-    // Make a table for actual values, 1 hour (7 indexes, data logged every 10th minute)
+    // Make a table for actual values, 1 hour
     $('#data').DataTable({
         order: [[0, "desc"]],
         paging: false,
@@ -38,7 +38,7 @@ function table_actual(stn) {
         info: false,
         ajax: {
             'url': 'tv_ws/_ws',
-            'data': {'ind': -7, 'stn': stn}
+            'data': {'ind': 1, 'stn': stn}
         },
         columns: [
             {
