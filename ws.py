@@ -42,7 +42,7 @@ query = """
     <INCLUDE>Observation.Air.Temperature.Value</INCLUDE>
     <INCLUDE>Observation.Wind.Direction.Value</INCLUDE>
     <INCLUDE>Observation.Wind.Speed.Value</INCLUDE>
-    <INCLUDE>Observation.Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value</INCLUDE>
+    <INCLUDE>Observation.Aggregated5minutes.Precipitation.TotalWaterEquivalent.Value</INCLUDE>
     <INCLUDE>Observation.Aggregated30minutes.Wind.SpeedMax.Value</INCLUDE>
     <INCLUDE>Name</INCLUDE>
     <INCLUDE>Geometry.WGS84</INCLUDE>
@@ -87,11 +87,11 @@ class Measurements:
                 logger.warning("Rain - delta is zero")
                 return 0
             else:
-                # Calculate rain amount per hour, sum av the last 6 10 minutes periods, assuming we get a new
-                # reading every 10 minute
+                # Calculate rain amount per hour, sum av the last 12 5-minutes periods, assuming we get a new
+                # reading every 5 minute
                 sum = 0
-                for elem in self.data[-6:]:
-                    sum += elem['Aggregated10minutes']['Precipitation']['TotalWaterEquivalent']['Value']
+                for elem in self.data[-12:]:
+                    sum += elem['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent']['Value']
                 return sum
 
         else:
@@ -99,12 +99,12 @@ class Measurements:
 
     def _check(self, msr):
         # Fields might be missing, set to default values
-        if 'Aggregated10minutes' not in msr:
-            msr['Aggregated10minutes'] = {}
-        if 'Precipitation' not in msr['Aggregated10minutes']:
-            msr['Aggregated10minutes']['Precipitation'] = {'TotalWaterEquivalent': {'Value': 0}}
-        if 'TotalWaterEquivalent' not in msr['Aggregated10minutes']['Precipitation']:
-            msr['Aggregated10minutes']['Precipitation']['TotalWaterEquivalent'] = {'Value': 0}
+        if 'Aggregated5minutes' not in msr:
+            msr['Aggregated5minutes'] = {}
+        if 'Precipitation' not in msr['Aggregated5minutes']:
+            msr['Aggregated5minutes']['Precipitation'] = {'TotalWaterEquivalent': {'Value': 0}}
+        if 'TotalWaterEquivalent' not in msr['Aggregated5minutes']['Precipitation']:
+            msr['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent'] = {'Value': 0}
 
         if 'Aggregated30minutes' not in msr:
             msr['Aggregated30minutes'] = {}

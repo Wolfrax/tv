@@ -8,6 +8,7 @@ let weather_data = {
         temp: [],
         hum: [],
         rain: [],
+        rain_acc: [],
         wind: [],
         wind_max: [],
         wind_barb: [],
@@ -47,7 +48,7 @@ function table_actual(stn) {
                 }, orderable: false
             },
             {data: 'Air.Temperature.Value', orderable: false},
-            {data: 'Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value', orderable: false},
+            {data: 'Aggregated5minutes.Precipitation.TotalWaterEquivalent.Value', orderable: false},
             {data: 'Air.RelativeHumidity.Value', orderable: false},
             {data: 'Wind[0].Speed.Value', orderable: false},
             {data: 'Aggregated30minutes.Wind.SpeedMax.Value', orderable: false},
@@ -77,7 +78,7 @@ function table_forecast(stn) {
                     'lon': json.data[json.data.length - 1].geometry.lon,
                 },
                 'dataSrc': function (json) {
-                    // Remove all elements in forecat that is older than 'now'
+                    // Remove all elements in forecast that is older than 'now'
                     let now = new Date().getUTCTime();
                     json.data.forEach(elem => {
                         if (new Date(elem.time).getTime() <= now) {
@@ -263,7 +264,15 @@ function getData_plot(stn) {
 
         $("#latest_temp").html(json.data[last].Air.Temperature.Value + "°C");
         $("#latest_hum").html(json.data[last].Air.RelativeHumidity.Value + "%");
-        $("#latest_rain").html(json.data[last].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value + "mm");
+        $("#latest_rain").html(json.data[last].Aggregated5minutes.Precipitation.TotalWaterEquivalent.Value + "mm/5m");
+        let rain_acc = 0.0 ;
+        json.data.forEach(elem => {
+            let val = parseFloat(elem.Aggregated5minutes.Precipitation.TotalWaterEquivalent.Value);
+            if (val == NaN) val = 0.0;
+            rain_acc += val;
+        });
+        $("#latest_day_rain").html(Math.round(rain_acc * 10) / 10 + "mm/24h");
+
         let wind_speed = json.data[last].Wind[0].Speed.Value ? json.data[last].Wind[0].Speed.Value : " --- "
         let wind_dir = json.data[last].Wind[0].Direction.Value !== null ? json.data[last].Wind[0].Direction.Value : " --- "
         $("#latest_wind_speed").html(wind_speed + "m/s");
@@ -288,7 +297,7 @@ function getData_plot(stn) {
             t = new Date(json.data[key].Sample).getTime();
             weather_data.actual.temp.push([t, json.data[key].Air.Temperature.Value]);
             weather_data.actual.hum.push([t, json.data[key].Air.RelativeHumidity.Value]);
-            weather_data.actual.rain.push([t, json.data[key].Aggregated10minutes.Precipitation.TotalWaterEquivalent.Value]);
+            weather_data.actual.rain.push([t, json.data[key].Aggregated5minutes.Precipitation.TotalWaterEquivalent.Value]);
 
             // Below values are tested for null, this might occur as some stations doesn't measure wind
             if (json.data[key].Wind[0].Speed.Value) {
