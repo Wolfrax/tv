@@ -57,6 +57,7 @@ query = """
 class Measurements:
     def __init__(self):
         self.data = []
+        self.data7days = []
 
         signal.signal(signal.SIGHUP, self.terminate)
         signal.signal(signal.SIGTERM, self.terminate)
@@ -67,6 +68,15 @@ class Measurements:
                     self.data = json.load(f)
                     for d in self.data:
                         self._check(d)  # Just in case there are missing fields in the file data, should not happen
+                except json.decoder.JSONDecodeError:
+                    pass
+        except FileNotFoundError:
+            pass
+
+        try:
+            with open('ws_7d.json', 'r', encoding='utf-8') as f:
+                try:
+                    self.data7days = json.load(f)
                 except json.decoder.JSONDecodeError:
                     pass
         except FileNotFoundError:
@@ -161,6 +171,13 @@ class Measurements:
         point_lat = float(point.split(' ')[2].split(')')[0])
 
         self.data[-1]['geometry'] = {'lon': point_lon, 'lat': point_lat}
+
+        if self.data7days:
+            if ((dt - parse(self.data7days[0]['ts'])).total_seconds() / 3600 ) > (7 * 24.0):
+                self.data7days['rain'] = self.data7days['rain'][1:]  # Keep record for 7 days only
+        self.data7days.append({'ts': head['Sample'],
+                               'rain': head['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent']['Value']})
+
         self._save()
 
     def _save(self):
@@ -168,6 +185,17 @@ class Measurements:
         fn = 'ws.json'
         with open(fn + '_tmp', 'w', encoding='utf-8') as f:
             json.dump(self.data, f, ensure_ascii=False, indent=4)
+            f.flush()
+
+        if os.path.exists(fn):
+            shutil.move(fn, fn + '_bck')
+
+        if os.path.exists(fn + '_tmp'):
+            shutil.move(fn + '_tmp', fn)
+
+        fn = 'ws_7days.json'
+        with open(fn + '_tmp', 'w', encoding='utf-8') as f:
+            json.dump(self.data7days, f, ensure_ascii=False, indent=4)
             f.flush()
 
         if os.path.exists(fn):
@@ -195,13 +223,7 @@ if __name__ == "__main__":
     http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
     logger.addHandler(http_handler)
 
-    # In case of logging to /var/log/syslog
-    # handler = logging.handlers.SysLogHandler(address='/dev/log')
-    # handler.setFormatter(formatter)
-    # handler.setLevel(logging.DEBUG)
-    # logger.addHandler(handler)
-
-    logger.info("Start v2.0 - {}".format(stn_name))
+    logger.info("Start v2.1 - {}".format(stn_name))
 
     try:
         r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
