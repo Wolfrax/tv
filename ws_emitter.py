@@ -76,6 +76,32 @@ def emit_7days():
                     i-= 1
             return {'data': obs[i:]}
 
+@app.route('/_ws7dayssum')
+def emit_7dayssum():
+    ind = request.args.get('ind', '')
+    stn = request.args.get('stn', '')
+
+    stn = '.' if stn == 'Lund' else './' + stn
+    rain_sum = 0
+
+    with open(stn + '/ws_7days.json') as f:
+        obs = json.load(f)
+        if ind == '':  # Return full series
+            for elem in obs:
+                rain_sum += float(elem['rain'])
+            return {'data': rain_sum}
+        elif int(ind) < 0:  # Return last ind items, not verified!
+            for elem in obs[int(ind):]:
+                rain_sum += int(elem['rain'])
+            return {'data': rain_sum}
+        else:  # Return last ind days, not verified!
+            last_dt = parser.parse(obs[-1]['ts'])
+            i = 0
+            for item in obs:
+                if (last_dt - parser.parse(item['ts'])).total_seconds() <= int(ind) * 24 * 60 * 60:
+                    i-= 1
+            return {'data': obs[i:]}
+
 def par_filter(lst, par):
     return next(item for item in lst['parameters'] if item['name'] == par)['values'][0]
 

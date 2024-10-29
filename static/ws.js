@@ -357,15 +357,8 @@ function getData_plot(stn) {
             plot();
         });
     });
-    $.getJSON('tv_ws/_ws7days', {stn: stn}, function (json) {
-        let rain_acc = 0.0 ;
-        json.data.forEach(elem => {
-            let val = parseFloat(elem.rain);
-            if (val == NaN) val = 0.0;
-            rain_acc += val;
-        });
-        $("#latest_7days_rain").html(Math.round(rain_acc * 10) / 10 + "mm/7d");
 
+    $.getJSON('tv_ws/_ws7dayssum', {stn: stn}, function (json) {
+       $("#latest_7days_rain").html(Math.round(json.data * 10) / 10 + "mm/7d");
     });
-
 }
