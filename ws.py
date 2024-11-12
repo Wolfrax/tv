@@ -229,7 +229,8 @@ if __name__ == "__main__":
         r = requests.post(url, data=query.encode('utf-8'), headers={'Content-Type': 'text/xml'}).json()
     except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError) as err:
         logger.error("Error connecting to {}".format(url))
-        sys.exit(0)
+        time.sleep(300)  # sleep for 5 min, 300 sec, before trying to reconnect
+        sys.exit(1)  # General error, will make systemd to restart the service
 
     sse_url = r['RESPONSE']['RESULT'][0]['INFO']['SSEURL']
     logger.info("Streaming URL: {}".format(sse_url))
