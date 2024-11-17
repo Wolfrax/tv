@@ -174,7 +174,8 @@ class Measurements:
 
         if self.data7days:
             if ((dt - parse(self.data7days[0]['ts'])).total_seconds() / 3600 ) > (7 * 24.0):
-                self.data7days['rain'] = self.data7days['rain'][1:]  # Keep record for 7 days only
+                self.data7days = self.data7days[1:]  # Keep record for 7 days only
+
         self.data7days.append({'ts': head['Sample'],
                                'rain': head['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent']['Value']})
 
