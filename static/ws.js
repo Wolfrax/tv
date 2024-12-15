@@ -208,7 +208,7 @@ function plot() {
         [{title: {text: 'Wind (m/s)'}}],
         [
             {name: 'Wind Max', data: wind_max, type: 'area', tooltip: {valueSuffix: 'm/s'}},
-            {name: 'Wind', data: wind, tooltip: {alueSuffix: 'm/s'}},
+            {name: 'Wind', data: wind, tooltip: {valueSuffix: 'm/s'}},
             {
                 name: 'Wind barb', type: 'windbarb', data: wind_barb.filter(
                     function (value, index) {
