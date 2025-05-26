@@ -1,0 +1,204 @@
+[
+    {
+        "Sample": "2021-12-24T10:00:01.000+01:00",
+        "Air": {
+            "Temperature": {
+                "Value": -9.4
+            },
+            "RelativeHumidity": {
+                "Value": 60.9
+            }
+        },
+        "Wind": [
+            {
+                "Speed": {
+                    "Value": 6.6
+                },
+                "Direction": {
+                    "Value": 270
+                }
+            }
+        ],
+        "Aggregated10minutes": {
+            "Precipitation": {
+                "TotalWaterEquivalent": {
+                    "Value": 0
+                }
+            }
+        },
+        "Aggregated30minutes": {
+            "Wind": {
+                "SpeedMax": {
+                    "Value": 10.5
+                }
+            }
+        },
+        "Precipitation": {
+            "Hourly": 0
+        },
+        "geometry": {
+            "lon": 17.75481,
+            "lat": 59.81604
+        }
+    },
+    {
+        "Sample": "2021-12-24T10:10:00.000+01:00",
+        "Air": {
+            "Temperature": {
+                "Value": -9.3
+            },
+            "RelativeHumidity": {
+                "Value": 62
+            }
+        },
+        "Wind": [
+            {
+                "Speed": {
+                    "Value": 7.1
+                },
+                "Direction": {
+                    "Value": 270
+                }
+            }
+        ],
+        "Aggregated10minutes": {
+            "Precipitation": {
+                "TotalWaterEquivalent": {
+                    "Value": 0
+                }
+            }
+        },
+        "Aggregated30minutes": {
+            "Wind": {
+                "SpeedMax": {
+                    "Value": 10.5
+                }
+            }
+        },
+        "Precipitation": {
+            "Hourly": 0
+        }
+    },
+    {
+        "Sample": "2021-12-24T10:20:01.000+01:00",
+        "Air": {
+            "Temperature": {
+                "Value": -9.4
+            },
+            "RelativeHumidity": {
+                "Value": 62.8
+            }
+        },
+        "Wind": [
+            {
+                "Speed": {
+                    "Value": 7
+                },
+                "Direction": {
+                    "Value": 270
+                }
+            }
+        ],
+        "Aggregated10minutes": {
+            "Precipitation": {
+                "TotalWaterEquivalent": {
+                    "Value": 0
+                }
+            }
+        },
+        "Aggregated30minutes": {
+            "Wind": {
+                "SpeedMax": {
+                    "Value": 10.8
+                }
+            }
+        },
+        "Precipitation": {
+            "Hourly": 0
+        }
+    },
+    {
+        "Sample": "2021-12-24T10:30:01.000+01:00",
+        "Air": {
+            "Temperature": {
+                "Value": -9.3
+            },
+            "RelativeHumidity": {
+                "Value": 62.5
+            }
+        },
+        "Wind": [
+            {
+                "Speed": {
+                    "Value": 7
+                },
+                "Direction": {
+                    "Value": 270
+                }
+            }
+        ],
+        "Aggregated10minutes": {
+            "Precipitation": {
+                "TotalWaterEquivalent": {
+                    "Value": 0
+                }
+            }
+        },
+        "Aggregated30minutes": {
+            "Wind": {
+                "SpeedMax": {
+                    "Value": 10.8
+                }
+            }
+        },
+        "Precipitation": {
+            "Hourly": 0
+        },
+        "geometry": {
+            "lon": 17.75481,
+            "lat": 59.81604
+        }
+    },
+    {
+        "Sample": "2021-12-24T10:40:00.000+01:00",
+        "Air": {
+            "Temperature": {
+                "Value": -9.4
+            },
+            "RelativeHumidity": {
+                "Value": 63.7
+            }
+        },
+        "Wind": [
+            {
+                "Speed": {
+                    "Value": 7.5
+                },
+                "Direction": {
+                    "Value": 270
+                }
+            }
+        ],
+        "Aggregated10minutes": {
+            "Precipitation": {
+                "TotalWaterEquivalent": {
+                    "Value": 0
+                }
+            }
+        },
+        "Aggregated30minutes": {
+            "Wind": {
+                "SpeedMax": {
+                    "Value": 10.8
+                }
+            }
+        },
+        "Precipitation": {
+            "Hourly": 0
+        },
+        "geometry": {
+            "lon": 17.75481,
+            "lat": 59.81604
+        }
+    }
+]
