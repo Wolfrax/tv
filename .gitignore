@@ -1,0 +1,9 @@
+# Exclude secrets
+auth.yml
+*/auth.yml
+
+# Python cache
+__pycache__/
+
+# Virtual environment
+venv/

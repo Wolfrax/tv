@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block content %}
+
+    <h2>Latest</h2>
+    <h4 id="latest_time"></h4>
+
+    <div class="row">
+        <div class="col-sm-3">
+            <div class="card h-100 text-white bg-primary mb-3 text-center w-auto" style="max-width: 18rem;">
+                <div class="card-body">
+                    <div class="card-text fs-4">Temperature</div>
+                    <div class="card-text fs-1" id="latest_temp"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="card h-100 text-white bg-success mb-3 text-center w-auto" style="max-width: 18rem;">
+                <div class="card-body">
+                    <div class="card-text fs-4">Humidity</div>
+                    <div class="card-text fs-1" id="latest_hum"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="card h-100 text-white bg-danger mb-3 text-center w-auto" style="max-width: 18rem;">
+                <div class="card-body">
+                    <div class="card-text fs-4">Rain</div>
+                    <div class="card-text fs-2" id="latest_rain"></div>
+                    <div class="card-text fs-2" id="latest_day_rain"></div>
+                    <div class="card-text fs-2" id="latest_7days_rain"></div>
+                    <div class="card-text fs-2" id="latest_cum_rain"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <div class="card h-100 text-white bg-warning mb-3 text-center w-auto" style="max-width: 18rem;">
+                <div class="card-body">
+                    <div class="card-text fs-4">Wind</div>
+                    <div class="card-text fs-1" id="latest_wind_speed"></div>
+                    <div class="card-text fs-1" id="latest_wind_dir"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="row">
+         <div class="col-sm-12 p-lg-2">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 m-lg-2 p-lg-2">
+            <input type="checkbox" id="fc_check" onclick="concat()" checked>
+            <label for="fc_check">Include forecast in graphs</label>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="ws_temp"></div>
+        </div>
+        <div class="col-sm-6">
+            <div id="ws_rain"></div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div id="ws_wind"></div>
+        </div>
+        <div class="col-sm-6">
+            <div id="ws_windrose"></div>
+        </div>
+    </div>
+
+    <h2>Last hour</h2>
+    <table id="data" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Temp</th>
+            <th>Rain</th>
+            <th>Humidity</th>
+            <th>Wind speed</th>
+            <th>Wind speed max</th>
+            <th>Wind direction</th>
+        </tr>
+        </thead>
+    </table>
+
+    <h2>Forecast</h2>
+    <table id="fc_data" class="table table-striped">
+        <thead>
+        <tr>
+            <th>Time</th>
+            <th>Temp</th>
+            <th>Rain</th>
+            <th>Humidity</th>
+            <th>Wind speed</th>
+            <th>Wind speed max</th>
+            <th>Wind direction</th>
+        </tr>
+        </thead>
+    </table>
+
+{% endblock %}
+{% block main %}
+    <script>$(document).ready(function () {
+        getData_plot('{{ stn }}');
+        table_actual('{{ stn }}');
+        table_forecast('{{ stn }}');
+    });</script>
+{% endblock %}
