@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <title>Weather {{ title }}</title>
+    <link rel="shortcut icon" href="https://www.viltstigen.se/favicon.png">
+    <style>
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>{{ head }}</h1>
+
+<h2>{{ head2 }}</h2>
+
+<table style="width:100%">
+    <thead>
+    <tr>
+        <th>Time</th>
+        <th>Temperature</th>
+        <th>Relative humidity</th>
+        <th>Rain</th>
+        <th>Wind direction</th>
+        <th>Wind speed</th>
+        <th>Wind speed max</th>
+    </tr>
+    <tr>
+        {% for val in data %}
+        <td> {{ val }} </td>
+        {% endfor %}
+    </tr>
+    </thead>
+</table>
+
+{% for img in images %}
+    <img src="{{ img }}">
+{% endfor %}
+
+<br>
+
+<footer>
+    <p style="font-size:14px">
+        Data by <a href="https://api.trafikinfo.trafikverket.se/">Trafikverket</a>
+        <br>
+        Published under these <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.sv">Terms and conditions</a>
+        <br>
+        Source code available at <a href="https://github.com/Wolfrax/tv">GitHub</a>
+    </p>
+    <p style="font-size:12px">
+        Copyright (C) Mats Melander
+    </p>
+</footer>
+</body>
+</html>

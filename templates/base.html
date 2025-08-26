@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+    <!-- CSS only -->
+    <style>
+        #map {
+        height: 600px;
+        }
+    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+    <link rel="shortcut icon" href="https://www.viltstigen.se/favicon.png">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+          crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+            crossorigin=""></script>
+    <script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8"
+            src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
+    <script src="https://code.highcharts.com/highcharts.js"></script>  <!-- Core Highcharts -->
+    <script src="https://code.highcharts.com/highcharts-more.js"></script> <!-- Wind barb module -->
+    <script src="https://code.highcharts.com/modules/exporting.js"></script>  <!-- Optional: Exporting module -->
+    <script src="https://code.highcharts.com/modules/export-data.js"></script> <!-- Optional: Export data module -->
+    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+    <script src="https://code.highcharts.com/modules/datagrouping.js"></script>
+    <script src="https://code.highcharts.com/modules/windbarb.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data-1970-2030.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://d3js.org/d3.v6.js"></script>
+    <script src="{{ url_for('static', filename='ws.js') }}"></script>
+    <script src="{{ url_for('static', filename='charts.js') }}"></script>
+    <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
+</head>
+<body>
+
+<div class="container-fluid">
+    <h1>{{ title }}</h1>
+    <hr>
+    {% block content %}{% endblock %}
+</div>
+{% block main %}{% endblock %}
+<footer>
+    <p style="font-size:14px">
+        Data by <a href="https://api.trafikinfo.trafikverket.se/">Trafikverket</a> and
+        <a href="http://opendata.smhi.se/apidocs/metfcst/index.html">SMHI</a>
+        <br>
+        Published under these <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.sv">Terms and
+        conditions</a>
+        <br>
+        Source code available at <a href="https://github.com/Wolfrax/tv">GitHub</a>
+    </p>
+    <p style="font-size:12px">
+        Copyright (C) Mats Melander
+    </p>
+</footer>
+</body>
+</html>
