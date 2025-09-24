@@ -234,7 +234,7 @@ if __name__ == "__main__":
         sys.exit(1)  # General error, will make systemd to restart the service
 
     sse_url = r['RESPONSE']['RESULT'][0]['INFO']['SSEURL']
-    logger.info("Streaming URL: {}".format(sse_url))
+    # logger.info("Streaming URL: {}".format(sse_url))
 
     msr = Measurements()
 
