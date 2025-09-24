@@ -7,3 +7,8 @@ __pycache__/
 
 # Virtual environment
 venv/
+*.json
+*.json_bck
+*.json_bck_old
+*.log
+
