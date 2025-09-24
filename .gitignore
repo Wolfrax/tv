@@ -9,6 +9,7 @@ __pycache__/
 venv/
 *.json
 *.json_bck
-*.json_bck_old
+*.json_bck.old
+*.json.old
 *.log
 
