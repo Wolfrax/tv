@@ -120,8 +120,10 @@ def fc():
         try:
             # "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
             data = requests.get(data_url).json()
-            print("STATUS:", r.status_code)
-            print("CONTENT:", r.text[:500])  # first 500 chars
+            from flask import current_app
+
+            current_app.logger.error(f"STATUS: {r.status_code}")
+            current_app.logger.error(f"CONTENT: {r.text[:500]}")
             res = []
             for par in data['timeSeries']:
                 res.append({'time': par['validTime'],
