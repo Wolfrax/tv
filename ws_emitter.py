@@ -105,6 +105,47 @@ def emit_7dayssum():
 def par_filter(lst, par):
     return next(item for item in lst['parameters'] if item['name'] == par)['values'][0]
 
+@app.route('/_fc_OLD')
+def fc_OLD():
+    lat = request.args.get('lat', '')
+    lon = request.args.get('lon', '')
+
+    if lat == '' or lon == '':
+        abort(404, description="Resource not found")
+
+    site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+    data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
+
+    from flask import current_app
+
+    try:
+        r = requests.get(data_url, timeout=10)
+
+        # 🔍 LOG BEFORE parsing
+        current_app.logger.error(f"STATUS: {r.status_code}")
+        current_app.logger.error(f"CONTENT: {r.text[:500]}")
+
+        r.raise_for_status()  # catches HTTP errors
+
+        data = r.json()
+
+        res = []
+        for par in data['timeSeries']:
+            res.append({
+                'time': par['validTime'],
+                'temp': par_filter(par, 't'),
+                'hum': par_filter(par, 'r'),
+                'rain': par_filter(par, 'pmax'),
+                'wind_speed': par_filter(par, 'ws'),
+                'wind_dir': par_filter(par, 'wd'),
+                'wind_max': par_filter(par, 'gust')
+            })
+
+        return jsonify({'data': res})
+
+    except Exception as e:
+        current_app.logger.exception("SMHI request failed")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/_fc')
 def fc():
