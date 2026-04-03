@@ -16,8 +16,8 @@ from dateutil import parser
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
-http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
-_LOGGER.addHandler(http_handler)
+#http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
+#_LOGGER.addHandler(http_handler)
 
 
 class ReverseProxied(object):
@@ -31,7 +31,7 @@ class ReverseProxied(object):
 
 
 app = Flask(__name__)
-app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
+# app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
 
 
 @app.route('/_ws')
@@ -160,11 +160,25 @@ def fc():
         data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
         try:
             # "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
-            data = requests.get(data_url).json()
-            from flask import current_app
+            r = requests.get(
+                data_url,
+                timeout=10,
+                headers={"User-Agent": "Mozilla/5.0"}
+            )
 
+            from flask import current_app
             current_app.logger.error(f"STATUS: {r.status_code}")
             current_app.logger.error(f"CONTENT: {r.text[:500]}")
+
+            r.raise_for_status()
+            data = r.json()
+
+            #data = requests.get(data_url).json()
+            #from flask import current_app
+
+            #current_app.logger.error(f"STATUS: {r.status_code}")
+            #current_app.logger.error(f"CONTENT: {r.text[:500]}")
+            
             res = []
             for par in data['timeSeries']:
                 res.append({'time': par['validTime'],
