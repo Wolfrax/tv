@@ -14,19 +14,6 @@ from logging.handlers import HTTPHandler
 from dateutil import parser
 import os
 
-_LOGGER = logging.getLogger(__name__)
-_LOGGER.setLevel(logging.DEBUG)
-
-
-class ReverseProxied(object):
-    def __init__(self, app, script_name):
-        self.app = app
-        self.script_name = script_name
-
-    def __call__(self, environ, start_response):
-        environ['SCRIPT_NAME'] = self.script_name
-        return self.app(environ, start_response)
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
@@ -102,53 +89,6 @@ def emit_7dayssum():
                     i-= 1
             return {'data': obs[i:]}
 
-def par_filter_OLD(lst, par):
-    return next(item for item in lst['parameters'] if item['name'] == par)['values'][0]
-
-@app.route('/_fc_OLD')
-def fc_OLD():
-    lat = request.args.get('lat', '')
-    lon = request.args.get('lon', '')
-
-    if lat == '' or lon == '':
-        abort(404, description="Resource not found")
-
-    #           https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/16/lat/58/data.json
-    site_url = "https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json"
-    #site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
-    data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
-
-    from flask import current_app
-
-    try:
-        r = requests.get(data_url, timeout=10)
-
-        # 🔍 LOG BEFORE parsing
-        current_app.logger.error(f"STATUS: {r.status_code}")
-        current_app.logger.error(f"CONTENT: {r.text[:500]}")
-
-        r.raise_for_status()  # catches HTTP errors
-
-        data = r.json()
-
-        res = []
-        for par in data['timeSeries']:
-            res.append({
-                'time': par['validTime'],
-                'temp': par_filter_OLD(par, 't'),
-                'hum': par_filter_OLD(par, 'r'),
-                'rain': par_filter_OLD(par, 'pmax'),
-                'wind_speed': par_filter_OLD(par, 'ws'),
-                'wind_dir': par_filter_OLD(par, 'wd'),
-                'wind_max': par_filter_OLD(par, 'gust')
-            })
-
-        return jsonify({'data': res})
-
-    except Exception as e:
-        current_app.logger.exception("SMHI request failed")
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/_fc')
 def fc():
     lat = request.args.get('lat', '')
@@ -157,32 +97,13 @@ def fc():
     if lat == '' or lon == '':
         abort(404, description="Resource not found")
     else:
-        #           https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/13.2242/lat/55.81807/data.json
         site_url = "https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json"
-        #site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
-
         data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
         try:
-            # "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
-            r = requests.get(
-                data_url,
-                timeout=10,
-                headers={"User-Agent": "Mozilla/5.0"}
-            )
-
-            from flask import current_app
-            current_app.logger.error(f"URL: {data_url}")
-            current_app.logger.error(f"STATUS: {r.status_code}")
-            current_app.logger.error(f"CONTENT: {r.text[:500]}")
+            r = requests.get(data_url, timeout=10, headers={"User-Agent": "Mozilla/5.0"})
 
             r.raise_for_status()
             data = r.json()
-
-            #data = requests.get(data_url).json()
-            #from flask import current_app
-
-            #current_app.logger.error(f"STATUS: {r.status_code}")
-            #current_app.logger.error(f"CONTENT: {r.text[:500]}")
             
             res = []
             for par in data['timeSeries']:
