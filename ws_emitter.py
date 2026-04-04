@@ -193,21 +193,23 @@ def fc():
             logging.warning("HTTPError")
             abort(404, description="Resource not found")
 
+import os
 
 @app.route('/')
 def index():
+    mapbox_token = os.environ.get("MAPBOX_TOKEN")
     stn = request.args.get('stn', '')
 
     if stn == '':
         abort(404, description="Resource not found")
     elif stn == 'Lund':
-        return render_template('ws.html', stn=stn, title='Weather Lund')
+        return render_template('ws.html', stn=stn, title='Weather Lund', , mapbox_token=mapbox_token)
     elif stn == 'Karlshamn':
-        return render_template('ws.html', stn=stn, title='Weather Karlshamn')
+        return render_template('ws.html', stn=stn, title='Weather Karlshamn', mapbox_token=mapbox_token)
     elif stn == 'Ralla':
-        return render_template('ws.html', stn=stn, title='Weather Öland')
+        return render_template('ws.html', stn=stn, title='Weather Öland', mapbox_token=mapbox_token)
     elif stn == 'Uppsala':
-        return render_template('ws.html', stn=stn, title='Weather Uppsala')
+        return render_template('ws.html', stn=stn, title='Weather Uppsala', mapbox_token=mapbox_token)
     else:
         abort(404, description="Resource not found")
 
