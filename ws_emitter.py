@@ -16,9 +16,6 @@ from dateutil import parser
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
 
-#http_handler = HTTPHandler('www.viltstigen.se', '/logger/log', method='POST', secure=True)
-#_LOGGER.addHandler(http_handler)
-
 
 class ReverseProxied(object):
     def __init__(self, app, script_name):
@@ -34,8 +31,6 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 app = Flask(__name__)
 app.config['APPLICATION_ROOT'] = '/tv_ws'
 app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
-
-# app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
 
 
 @app.route('/_ws')
@@ -117,7 +112,9 @@ def fc_OLD():
     if lat == '' or lon == '':
         abort(404, description="Resource not found")
 
-    site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+    #           https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/16/lat/58/data.json
+    site_url = "https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json"
+    #site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
     data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
 
     from flask import current_app
@@ -159,7 +156,8 @@ def fc():
     if lat == '' or lon == '':
         abort(404, description="Resource not found")
     else:
-        site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
+        site_url = "https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json"
+        #site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
 
         data_url = uritemplate.expand(site_url, lon=lon, lat=lat)
         try:
