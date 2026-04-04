@@ -12,6 +12,7 @@ import requests
 import uritemplate
 from logging.handlers import HTTPHandler
 from dateutil import parser
+import os
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.setLevel(logging.DEBUG)
@@ -148,9 +149,6 @@ def fc_OLD():
         current_app.logger.exception("SMHI request failed")
         return jsonify({'error': str(e)}), 500
 
-def par_filter(lst, par):
-    return next(item for item in lst['data'] if item['name'] == par)['values'][0]
-
 @app.route('/_fc')
 def fc():
     lat = request.args.get('lat', '')
@@ -189,18 +187,16 @@ def fc():
             res = []
             for par in data['timeSeries']:
                 res.append({'time': par['time'],
-                            'temp': par_filter(par, 'air_temperature'),
-                            'hum': par_filter(par, 'relative_humidity'),
-                            'rain': par_filter(par, 'precipitation_amount_max'),
-                            'wind_speed': par_filter(par, 'wind_speed'),
-                            'wind_dir': par_filter(par, 'wind_from_direction'),
-                            'wind_max': par_filter(par, 'wind_speed_of_gust')})
+                            'temp': par['data']['air_temperature'],
+                            'hum': par['data']['relative_humidity'],
+                            'rain': par['data']['precipitation_amount_max'],
+                            'wind_speed': par['data']['wind_speed'],
+                            'wind_dir': par['data']['wind_from_direction'],
+                            'wind_max': par['data']['wind_speed_of_gust']})
             return jsonify({'data': res})
         except requests.HTTPError:
             logging.warning("HTTPError")
             abort(404, description="Resource not found")
-
-import os
 
 @app.route('/')
 def index():
