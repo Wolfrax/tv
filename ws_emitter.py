@@ -29,7 +29,6 @@ class ReverseProxied(object):
         environ['SCRIPT_NAME'] = self.script_name
         return self.app(environ, start_response)
 
-
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 app = Flask(__name__)
