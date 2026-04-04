@@ -101,7 +101,7 @@ def emit_7dayssum():
                     i-= 1
             return {'data': obs[i:]}
 
-def par_filter(lst, par):
+def par_filter_OLD(lst, par):
     return next(item for item in lst['parameters'] if item['name'] == par)['values'][0]
 
 @app.route('/_fc_OLD')
@@ -134,12 +134,12 @@ def fc_OLD():
         for par in data['timeSeries']:
             res.append({
                 'time': par['validTime'],
-                'temp': par_filter(par, 't'),
-                'hum': par_filter(par, 'r'),
-                'rain': par_filter(par, 'pmax'),
-                'wind_speed': par_filter(par, 'ws'),
-                'wind_dir': par_filter(par, 'wd'),
-                'wind_max': par_filter(par, 'gust')
+                'temp': par_filter_OLD(par, 't'),
+                'hum': par_filter_OLD(par, 'r'),
+                'rain': par_filter_OLD(par, 'pmax'),
+                'wind_speed': par_filter_OLD(par, 'ws'),
+                'wind_dir': par_filter_OLD(par, 'wd'),
+                'wind_max': par_filter_OLD(par, 'gust')
             })
 
         return jsonify({'data': res})
@@ -147,6 +147,9 @@ def fc_OLD():
     except Exception as e:
         current_app.logger.exception("SMHI request failed")
         return jsonify({'error': str(e)}), 500
+
+def par_filter(lst, par):
+    return next(item for item in lst['data'] if item['name'] == par)['values'][0]
 
 @app.route('/_fc')
 def fc():
@@ -185,13 +188,13 @@ def fc():
             
             res = []
             for par in data['timeSeries']:
-                res.append({'time': par['validTime'],
-                            'temp': par_filter(par, 't'),
-                            'hum': par_filter(par, 'r'),
-                            'rain': par_filter(par, 'pmax'),
-                            'wind_speed': par_filter(par, 'ws'),
-                            'wind_dir': par_filter(par, 'wd'),
-                            'wind_max': par_filter(par, 'gust')})
+                res.append({'time': par['time'],
+                            'temp': par_filter(par, 'air_temperature'),
+                            'hum': par_filter(par, 'relative_humidity'),
+                            'rain': par_filter(par, 'precipitation_amount_max'),
+                            'wind_speed': par_filter(par, 'wind_speed'),
+                            'wind_dir': par_filter(par, 'wind_from_direction'),
+                            'wind_max': par_filter(par, 'wind_speed_of_gust')})
             return jsonify({'data': res})
         except requests.HTTPError:
             logging.warning("HTTPError")
