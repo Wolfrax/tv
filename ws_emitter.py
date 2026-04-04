@@ -156,6 +156,7 @@ def fc():
     if lat == '' or lon == '':
         abort(404, description="Resource not found")
     else:
+        #           https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/13.2242/lat/55.81807/data.json
         site_url = "https://opendata-download-metfcst.smhi.se/api/category/snow1g/version/1/geotype/point/lon/{lon}/lat/{lat}/data.json"
         #site_url = "https://opendata-download-metfcst.smhi.se/api/category/pmp3g/version/2/geotype/point/lon/{lon}/lat/{lat}/data.json"
 
@@ -169,6 +170,7 @@ def fc():
             )
 
             from flask import current_app
+            current_app.logger.error(f"URL: {data_url}")
             current_app.logger.error(f"STATUS: {r.status_code}")
             current_app.logger.error(f"CONTENT: {r.text[:500]}")
 
