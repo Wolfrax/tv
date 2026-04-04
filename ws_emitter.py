@@ -31,6 +31,7 @@ class ReverseProxied(object):
 
 
 app = Flask(__name__)
+app.config['APPLICATION_ROOT'] = '/tv_ws'
 # app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
 
 
