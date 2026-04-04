@@ -30,8 +30,11 @@ class ReverseProxied(object):
         return self.app(environ, start_response)
 
 
+from werkzeug.middleware.proxy_fix import ProxyFix
+
 app = Flask(__name__)
-app.config['APPLICATION_ROOT'] = '/tv_ws'
+app.wsgi_app = ProxyFix(app.wsgi_app, x_prefix=1)
+
 # app.wsgi_app = ReverseProxied(app.wsgi_app, script_name='/tv_ws')
 
 
