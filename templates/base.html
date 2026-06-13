@@ -246,19 +246,21 @@
     .table-card-sub { font-size: .72rem; color: var(--muted); font-weight: 400; }
 
     /* ── DataTables dark overrides ──────────────────────────────── */
-    .dataTables_wrapper { color: var(--text); font-size: .8rem; }
+    .dataTables_wrapper { color: var(--text) !important; font-size: .8rem; background: transparent !important; }
     .dataTables_wrapper .dataTables_filter,
     .dataTables_wrapper .dataTables_length { padding: .6rem 1.25rem; color: var(--muted); }
+    .dataTables_wrapper .dataTables_filter label,
+    .dataTables_wrapper .dataTables_length label { color: var(--muted) !important; }
     .dataTables_wrapper .dataTables_filter input,
     .dataTables_wrapper .dataTables_length select {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid var(--border);
+      background: var(--surface) !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
       border-radius: 6px;
       padding: .2rem .5rem;
       outline: none;
     }
-    .dataTables_wrapper .dataTables_info { padding: .5rem 1.25rem; color: var(--muted); font-size: .72rem; }
+    .dataTables_wrapper .dataTables_info { padding: .5rem 1.25rem; color: var(--muted) !important; font-size: .72rem; }
     .dataTables_wrapper .dataTables_paginate { padding: .5rem 1.25rem; }
     .dataTables_wrapper .dataTables_paginate .paginate_button {
       background: transparent !important;
@@ -282,26 +284,33 @@
       border-color: var(--border) !important;
       cursor: default;
     }
-    table.dataTable { border-collapse: collapse !important; width: 100% !important; color: var(--text); }
-    table.dataTable.no-footer { border-bottom: none; }
-    table.dataTable thead th {
-      padding: .5rem 1rem;
+    table.dataTable { border-collapse: collapse !important; width: 100% !important; color: var(--text) !important; }
+    table.dataTable.no-footer { border-bottom: none !important; }
+    table.dataTable thead th,
+    table.dataTable thead td {
+      padding: .5rem 1rem !important;
       font-size: .7rem;
       text-transform: uppercase;
       letter-spacing: .07em;
-      color: var(--muted);
+      color: var(--muted) !important;
       font-weight: 600;
       border-bottom: 1px solid var(--border) !important;
-      background: var(--surface);
+      background-color: var(--surface) !important;
     }
     table.dataTable thead th.sorting,
     table.dataTable thead th.sorting_asc,
-    table.dataTable thead th.sorting_desc { background-image: none; }
-    table.dataTable tbody td { padding: .55rem 1rem; border-bottom: 1px solid #1e2e44; }
-    table.dataTable tbody tr:last-child td { border-bottom: none; }
-    table.dataTable tbody tr:hover td { background: #ffffff07; }
-    table.dataTable tbody tr.odd  { background: transparent; }
-    table.dataTable tbody tr.even { background: #ffffff04; }
+    table.dataTable thead th.sorting_desc { background-image: none !important; }
+    table.dataTable tbody tr { background-color: transparent !important; }
+    table.dataTable tbody tr.odd  { background-color: transparent !important; }
+    table.dataTable tbody tr.even { background-color: #ffffff05 !important; }
+    table.dataTable tbody td {
+      padding: .55rem 1rem !important;
+      border-bottom: 1px solid #1e2e44 !important;
+      border-top: none !important;
+      color: var(--text) !important;
+    }
+    table.dataTable tbody tr:last-child td { border-bottom: none !important; }
+    table.dataTable tbody tr:hover td { background-color: #ffffff0a !important; }
 
     /* ── Footer ─────────────────────────────────────────────────── */
     footer {
