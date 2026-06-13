@@ -1,65 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>{{ title }}</title>
-    <!-- CSS only -->
-    <style>
-        #map {
-        height: 600px;
-        }
-    </style>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
-    <link rel="shortcut icon" href="https://www.viltstigen.se/favicon.png">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
-          integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
-          crossorigin=""/>
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
-            integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
-            crossorigin=""></script>
-    <script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>
-    <script type="text/javascript" charset="utf8"
-            src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
-    <script type="text/javascript" charset="utf8"
-            src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.js"></script>
-    <script src="https://code.highcharts.com/highcharts.js"></script>  <!-- Core Highcharts -->
-    <script src="https://code.highcharts.com/highcharts-more.js"></script> <!-- Wind barb module -->
-    <script src="https://code.highcharts.com/modules/exporting.js"></script>  <!-- Optional: Exporting module -->
-    <script src="https://code.highcharts.com/modules/export-data.js"></script> <!-- Optional: Export data module -->
-    <script src="https://code.highcharts.com/modules/accessibility.js"></script>
-    <script src="https://code.highcharts.com/modules/datagrouping.js"></script>
-    <script src="https://code.highcharts.com/modules/windbarb.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data-1970-2030.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://d3js.org/d3.v6.js"></script>
-    <script>const MAPBOX_TOKEN = "{{ mapbox_token }}";</script>
-    <script src="{{ url_for('static', filename='ws.js') }}"></script>
-    <script src="{{ url_for('static', filename='charts.js') }}"></script>
-    <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <link rel="shortcut icon" href="https://www.viltstigen.se/favicon.png">
+  <!-- Bootstrap Icons (used for wind direction arrows) -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin=""/>
+  <!-- DataTables -->
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.25/css/jquery.dataTables.min.css">
+
+  <style>
+    /* ── Reset & base ───────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0b1120;
+      --surface: #131d30;
+      --card:    #1a2742;
+      --border:  #253554;
+      --text:    #e2e8f0;
+      --muted:   #7d92b2;
+      --accent:  #3b82f6;
+      --temp:    #f97316;
+      --hum:     #22c55e;
+      --rain:    #06b6d4;
+      --wind:    #a78bfa;
+      --gust:    #f43f5e;
+      --radius:  12px;
+      --shadow:  0 4px 24px rgba(0,0,0,.45);
+    }
+
+    html { font-size: 16px; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Map ────────────────────────────────────────────────────── */
+    #map { height: 280px; }
+
+    /* ── Top nav ────────────────────────────────────────────────── */
+    .topnav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+    }
+    .logo span { color: var(--accent); }
+
+    .station-tabs {
+      display: flex;
+      gap: 0;
+      flex: 1;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .station-tabs::-webkit-scrollbar { display: none; }
+
+    .station-tab {
+      padding: 0 1.25rem;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      font-size: .875rem;
+      font-weight: 500;
+      color: var(--muted);
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      text-decoration: none !important;
+      transition: color .15s, border-color .15s;
+    }
+    .station-tab:hover { color: var(--text); }
+    .station-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    .nav-meta {
+      font-size: .72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      text-align: right;
+      line-height: 1.5;
+    }
+
+    /* ── Page wrapper ───────────────────────────────────────────── */
+    .page { max-width: 1400px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
+
+    /* ── Hero ───────────────────────────────────────────────────── */
+    .hero { display: flex; align-items: flex-end; gap: 1rem; margin-bottom: 1.5rem; }
+    .hero-title { font-size: 2rem; font-weight: 700; line-height: 1; }
+    .hero-sub { font-size: .8rem; color: var(--muted); margin-top: .3rem; }
+    .hero-right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
+
+    .live-badge {
+      background: #14532d33;
+      border: 1px solid #22c55e55;
+      color: #4ade80;
+      font-size: .75rem;
+      font-weight: 600;
+      padding: .25rem .75rem;
+      border-radius: 99px;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+    .live-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Metric cards ───────────────────────────────────────────── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 900px) { .metrics { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .metrics { grid-template-columns: 1fr; } }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .metric-card.temp::before { background: var(--temp); }
+    .metric-card.hum::before  { background: var(--hum); }
+    .metric-card.rain::before { background: var(--rain); }
+    .metric-card.wind::before { background: var(--wind); }
+
+    .metric-icon   { font-size: 1.5rem; margin-bottom: .5rem; display: block; }
+    .metric-label  { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; margin-bottom: .35rem; }
+    .metric-value  { font-size: 2.5rem; font-weight: 800; line-height: 1; letter-spacing: -0.03em; min-height: 2.5rem; }
+    .metric-sub    { margin-top: .75rem; display: flex; flex-direction: column; gap: .3rem; }
+    .metric-sub-row { display: flex; justify-content: space-between; font-size: .8rem; color: var(--muted); }
+    .metric-sub-row strong { color: var(--text); }
+
+    .temp .metric-value { color: var(--temp); }
+    .hum  .metric-value { color: var(--hum); }
+    .rain .metric-value { color: var(--rain); }
+    .wind .metric-value { color: var(--wind); }
+
+    /* ── Section headers ────────────────────────────────────────── */
+    .section-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; margin-top: 1.5rem; }
+    .section-title  { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; }
+    .section-pill   { font-size: .7rem; font-weight: 600; padding: .15rem .6rem; border-radius: 99px; background: #3b82f620; color: var(--accent); border: 1px solid #3b82f640; white-space: nowrap; }
+    .section-sep    { flex: 1; height: 1px; background: var(--border); }
+
+    .toggle-fc { display: flex; align-items: center; gap: .5rem; font-size: .8rem; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
+    .toggle-fc input { accent-color: var(--accent); cursor: pointer; }
+
+    /* ── Charts grid ────────────────────────────────────────────── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 768px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: .75rem 1rem;
+      box-shadow: var(--shadow);
+    }
+    .chart-container { height: 300px; }
+
+    /* ── Map + table side-by-side ───────────────────────────────── */
+    .map-table-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 900px) { .map-table-grid { grid-template-columns: 1fr; } }
+
+    .map-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .card-header {
+      padding: .65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-size: .875rem;
+      font-weight: 600;
+    }
+
+    .table-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .table-card-header {
+      padding: .65rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: .875rem;
+      font-weight: 600;
+    }
+    .table-card-sub { font-size: .72rem; color: var(--muted); font-weight: 400; }
+
+    /* ── DataTables dark overrides ──────────────────────────────── */
+    .dataTables_wrapper { color: var(--text); font-size: .8rem; }
+    .dataTables_wrapper .dataTables_filter,
+    .dataTables_wrapper .dataTables_length { padding: .6rem 1.25rem; color: var(--muted); }
+    .dataTables_wrapper .dataTables_filter input,
+    .dataTables_wrapper .dataTables_length select {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: .2rem .5rem;
+      outline: none;
+    }
+    .dataTables_wrapper .dataTables_info { padding: .5rem 1.25rem; color: var(--muted); font-size: .72rem; }
+    .dataTables_wrapper .dataTables_paginate { padding: .5rem 1.25rem; }
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+      background: transparent !important;
+      border: 1px solid var(--border) !important;
+      color: var(--muted) !important;
+      border-radius: 6px !important;
+      margin: 0 2px;
+      padding: .2rem .6rem !important;
+      cursor: pointer;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+    .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
+      color: #fff !important;
+    }
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+    .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+      color: var(--border) !important;
+      background: transparent !important;
+      border-color: var(--border) !important;
+      cursor: default;
+    }
+    table.dataTable { border-collapse: collapse !important; width: 100% !important; color: var(--text); }
+    table.dataTable.no-footer { border-bottom: none; }
+    table.dataTable thead th {
+      padding: .5rem 1rem;
+      font-size: .7rem;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      font-weight: 600;
+      border-bottom: 1px solid var(--border) !important;
+      background: var(--surface);
+    }
+    table.dataTable thead th.sorting,
+    table.dataTable thead th.sorting_asc,
+    table.dataTable thead th.sorting_desc { background-image: none; }
+    table.dataTable tbody td { padding: .55rem 1rem; border-bottom: 1px solid #1e2e44; }
+    table.dataTable tbody tr:last-child td { border-bottom: none; }
+    table.dataTable tbody tr:hover td { background: #ffffff07; }
+    table.dataTable tbody tr.odd  { background: transparent; }
+    table.dataTable tbody tr.even { background: #ffffff04; }
+
+    /* ── Footer ─────────────────────────────────────────────────── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: .75rem;
+      color: var(--muted);
+      line-height: 1.9;
+    }
+    footer a { color: var(--muted); }
+    footer a:hover { color: var(--text); }
+  </style>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+          integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+          crossorigin=""></script>
+  <!-- jQuery -->
+  <script src="{{ url_for('static', filename='jquery-3.6.0.min.js') }}"></script>
+  <!-- DataTables (standard, no Bootstrap dependency) -->
+  <script src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.js"></script>
+  <!-- Highcharts -->
+  <script src="https://code.highcharts.com/highcharts.js"></script>
+  <script src="https://code.highcharts.com/highcharts-more.js"></script>
+  <script src="https://code.highcharts.com/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+  <script src="https://code.highcharts.com/modules/datagrouping.js"></script>
+  <script src="https://code.highcharts.com/modules/windbarb.js"></script>
+  <!-- Moment.js + timezone -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.34/moment-timezone-with-data-1970-2030.min.js"></script>
+  <!-- D3 (used for wind-rose binning) -->
+  <script src="https://d3js.org/d3.v6.js"></script>
+  <!-- App scripts -->
+  <script>const MAPBOX_TOKEN = "{{ mapbox_token }}";</script>
+  <script src="{{ url_for('static', filename='ws.js') }}"></script>
+  <script src="{{ url_for('static', filename='charts.js') }}"></script>
+  <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
 </head>
 <body>
-
-<div class="container-fluid">
-    <h1>{{ title }}</h1>
-    <hr>
-    {% block content %}{% endblock %}
-</div>
-{% block main %}{% endblock %}
-<footer>
-    <p style="font-size:14px">
-        Data by <a href="https://api.trafikinfo.trafikverket.se/">Trafikverket</a> and
-        <a href="http://opendata.smhi.se/apidocs/metfcst/index.html">SMHI</a>
-        <br>
-        Published under these <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.sv">Terms and
-        conditions</a>
-        <br>
-        Source code available at <a href="https://github.com/Wolfrax/tv">GitHub</a>
-    </p>
-    <p style="font-size:12px">
-        Copyright (C) Mats Melander
-    </p>
-</footer>
+{% block body %}{% endblock %}
 </body>
 </html>

@@ -171,24 +171,24 @@ function plot() {
             {
                 title: {
                     text: 'Temperature (°C)',
-                    style: {color: 'gray'}
+                    style: {color: '#f97316'}
                 },
                 labels: {
-                    style: {color: 'gray'}
+                    style: {color: '#f97316'}
                 },
                 lineWidth: 2,
-                lineColor: 'gray',
+                lineColor: '#f97316',
             },
             {
                 title: {
                     text: 'Humidity (%)',
-                    style: {color: '#6CF'}
+                    style: {color: '#22c55e'}
                 },
                 labels: {
-                    style: {color: '#6CF'}
+                    style: {color: '#22c55e'}
                 },
                 lineWidth: 2,
-                lineColor: '#6CF',
+                lineColor: '#22c55e',
                 opposite: true,
             }
         ],
@@ -197,14 +197,14 @@ function plot() {
                 yAxis: 0,
                 name: 'Temperature',
                 data: temps,
-                color: 'gray',
+                color: '#f97316',
                 tooltip: {valueSuffix: '°C'},
             },
             {
                 yAxis: 1,
                 name: 'Humidity',
                 data: hums,
-                color: '#6CF',
+                color: '#22c55e',
                 tooltip: {valueSuffix: '%'},
             },
         ],
@@ -213,16 +213,16 @@ function plot() {
     plot_ws('ws_rain', 'Rain',
         [{title: {text: 'Rain (mm)'}}, {title: {text: 'Rain acc (mm)'}, opposite: true}],
         [
-            {yAxis: 0, name: 'Rain', data: rain, type: 'area', tooltip: {valueSuffix: 'mm'}},
-            {yAxis: 1, name: 'Rain acc', data: rain_cum, tooltip: {valueSuffix: 'mm'}}
+            {yAxis: 0, name: 'Rain', data: rain, type: 'area', color: '#06b6d4', tooltip: {valueSuffix: 'mm'}},
+            {yAxis: 1, name: 'Rain acc', data: rain_cum, color: '#a78bfa', tooltip: {valueSuffix: 'mm'}}
         ]
     );
 
     plot_ws('ws_wind', 'Wind',
         [{title: {text: 'Wind (m/s)'}}],
         [
-            {name: 'Wind Max', data: wind_max, type: 'area', tooltip: {valueSuffix: 'm/s'}},
-            {name: 'Wind', data: wind, tooltip: {valueSuffix: 'm/s'}},
+            {name: 'Wind Max', data: wind_max, type: 'area', color: '#f43f5e', tooltip: {valueSuffix: 'm/s'}},
+            {name: 'Wind', data: wind, color: '#a78bfa', tooltip: {valueSuffix: 'm/s'}},
             {
                 name: 'Wind barb', type: 'windbarb', data: wind_barb.filter(
                     function (value, index) {
@@ -332,13 +332,10 @@ function getData_plot(stn) {
 
         // Draw a map, and put a marker for the station
         let map = L.map('map', {dragging: false}).setView([json.data[last].geometry.lat, json.data[last].geometry.lon], 10);
-        L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-            maxZoom: 18,
-            id: 'mapbox/streets-v11',
-            tileSize: 512,
-            zoomOffset: -1,
-            accessToken: MAPBOX_TOKEN
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
         }).addTo(map);
         L.marker([json.data[last].geometry.lat, json.data[last].geometry.lon]).addTo(map);
 

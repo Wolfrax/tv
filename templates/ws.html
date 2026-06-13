@@ -1,90 +1,104 @@
 {% extends 'base.html' %}
-{% block content %}
+{% block body %}
 
-    <h2>Latest</h2>
-    <h4 id="latest_time"></h4>
+<!-- ── TOP NAV ──────────────────────────────────────────────────── -->
+<nav class="topnav">
+  <div class="logo">Väg<span>Väder</span></div>
+  <div class="station-tabs">
+    <a href="/?stn=Lund"      class="station-tab {% if stn == 'Lund' %}active{% endif %}">Lund N</a>
+    <a href="/?stn=Karlshamn" class="station-tab {% if stn == 'Karlshamn' %}active{% endif %}">Karlshamn</a>
+    <a href="/?stn=Ralla"     class="station-tab {% if stn == 'Ralla' %}active{% endif %}">Ralla / Öland</a>
+    <a href="/?stn=Uppsala"   class="station-tab {% if stn == 'Uppsala' %}active{% endif %}">Uppsala</a>
+  </div>
+  <div class="nav-meta" id="latest_time"></div>
+</nav>
 
-    <div class="row">
-        <div class="col-sm-3">
-            <div class="card h-100 text-white bg-primary mb-3 text-center w-auto" style="max-width: 18rem;">
-                <div class="card-body">
-                    <div class="card-text fs-4">Temperature</div>
-                    <div class="card-text fs-1" id="latest_temp"></div>
-                </div>
-            </div>
-        </div>
+<!-- ── MAIN PAGE ─────────────────────────────────────────────────── -->
+<main class="page">
 
-        <div class="col-sm-3">
-            <div class="card h-100 text-white bg-success mb-3 text-center w-auto" style="max-width: 18rem;">
-                <div class="card-body">
-                    <div class="card-text fs-4">Humidity</div>
-                    <div class="card-text fs-1" id="latest_hum"></div>
-                </div>
-            </div>
-        </div>
+  <!-- Hero -->
+  <div class="hero">
+    <div>
+      <div class="hero-title">{{ title | replace('Weather ', '') }}</div>
+    </div>
+    <div class="hero-right">
+      <div class="live-badge">Live data</div>
+    </div>
+  </div>
 
-        <div class="col-sm-3">
-            <div class="card h-100 text-white bg-danger mb-3 text-center w-auto" style="max-width: 18rem;">
-                <div class="card-body">
-                    <div class="card-text fs-4">Rain</div>
-                    <div class="card-text fs-2" id="latest_rain"></div>
-                    <div class="card-text fs-2" id="latest_day_rain"></div>
-                    <div class="card-text fs-2" id="latest_7days_rain"></div>
-                    <div class="card-text fs-2" id="latest_cum_rain"></div>
-                </div>
-            </div>
-        </div>
+  <!-- ── METRIC CARDS ──────────────────────────────────────────── -->
+  <div class="metrics">
 
-        <div class="col-sm-3">
-            <div class="card h-100 text-white bg-warning mb-3 text-center w-auto" style="max-width: 18rem;">
-                <div class="card-body">
-                    <div class="card-text fs-4">Wind</div>
-                    <div class="card-text fs-1" id="latest_wind_speed"></div>
-                    <div class="card-text fs-1" id="latest_wind_dir"></div>
-                </div>
-            </div>
-        </div>
+    <div class="metric-card temp">
+      <span class="metric-icon">🌡️</span>
+      <div class="metric-label">Temperature</div>
+      <div class="metric-value" id="latest_temp">—</div>
     </div>
 
-    <br>
-
-    <div class="row">
-         <div class="col-sm-12 p-lg-2">
-            <div id="map"></div>
-        </div>
+    <div class="metric-card hum">
+      <span class="metric-icon">💧</span>
+      <div class="metric-label">Humidity</div>
+      <div class="metric-value" id="latest_hum">—</div>
     </div>
 
-    <div class="row">
-        <div class="col-sm-12 m-lg-2 p-lg-2">
-            <input type="checkbox" id="fc_check" onclick="concat()" checked>
-            <label for="fc_check">Include forecast in graphs</label>
-        </div>
+    <div class="metric-card rain">
+      <span class="metric-icon">🌧️</span>
+      <div class="metric-label">Precipitation</div>
+      <div class="metric-value" id="latest_rain">—</div>
+      <div class="metric-sub">
+        <div class="metric-sub-row"><span>Last 24 h</span><strong id="latest_day_rain">—</strong></div>
+        <div class="metric-sub-row"><span>Last 7 days</span><strong id="latest_7days_rain">—</strong></div>
+        <div class="metric-sub-row"><span>Accumulated</span><strong id="latest_cum_rain">—</strong></div>
+      </div>
     </div>
 
-    <hr>
-
-    <div class="row">
-        <div class="col-sm-6">
-            <div id="ws_temp"></div>
-        </div>
-        <div class="col-sm-6">
-            <div id="ws_rain"></div>
-        </div>
-
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div id="ws_wind"></div>
-        </div>
-        <div class="col-sm-6">
-            <div id="ws_windrose"></div>
-        </div>
+    <div class="metric-card wind">
+      <span class="metric-icon">💨</span>
+      <div class="metric-label">Wind</div>
+      <div class="metric-value" id="latest_wind_speed">—</div>
+      <div class="metric-sub">
+        <div class="metric-sub-row"><span>Direction</span><strong id="latest_wind_dir">—</strong></div>
+      </div>
     </div>
 
-    <h2>Last hour</h2>
-    <table id="data" class="table table-striped">
+  </div>
+
+  <!-- ── CHARTS ────────────────────────────────────────────────── -->
+  <div class="section-header">
+    <span class="section-title">Charts</span>
+    <div class="section-sep"></div>
+    <label class="toggle-fc">
+      <input type="checkbox" id="fc_check" onclick="concat()" checked> Include SMHI forecast
+    </label>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card"><div id="ws_temp"     class="chart-container"></div></div>
+    <div class="chart-card"><div id="ws_rain"     class="chart-container"></div></div>
+    <div class="chart-card"><div id="ws_wind"     class="chart-container"></div></div>
+    <div class="chart-card"><div id="ws_windrose" class="chart-container"></div></div>
+  </div>
+
+  <!-- ── MAP + LAST HOUR ───────────────────────────────────────── -->
+  <div class="section-header">
+    <span class="section-title">Location &amp; Observations</span>
+    <div class="section-sep"></div>
+  </div>
+
+  <div class="map-table-grid">
+
+    <div class="map-card">
+      <div class="card-header">📍 Station location</div>
+      <div id="map"></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-card-header">
+        Last hour
+      </div>
+      <table id="data" class="display dataTable no-footer">
         <thead>
-        <tr>
+          <tr>
             <th>Time</th>
             <th>Temp</th>
             <th>Rain</th>
@@ -92,30 +106,57 @@
             <th>Wind speed</th>
             <th>Wind speed max</th>
             <th>Wind direction</th>
-        </tr>
+          </tr>
         </thead>
-    </table>
+      </table>
+    </div>
 
-    <h2>Forecast</h2>
-    <table id="fc_data" class="table table-striped">
-        <thead>
+  </div>
+
+  <!-- ── FORECAST TABLE ────────────────────────────────────────── -->
+  <div class="section-header">
+    <span class="section-title">SMHI Forecast</span>
+    <span class="section-pill">Next 24+ h</span>
+    <div class="section-sep"></div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-card-header">
+      Hourly forecast
+      <span class="table-card-sub">Source: SMHI open data</span>
+    </div>
+    <table id="fc_data" class="display dataTable no-footer">
+      <thead>
         <tr>
-            <th>Time</th>
-            <th>Temp</th>
-            <th>Rain</th>
-            <th>Humidity</th>
-            <th>Wind speed</th>
-            <th>Wind speed max</th>
-            <th>Wind direction</th>
+          <th>Time</th>
+          <th>Temp</th>
+          <th>Rain</th>
+          <th>Humidity</th>
+          <th>Wind speed</th>
+          <th>Wind speed max</th>
+          <th>Wind direction</th>
         </tr>
-        </thead>
+      </thead>
     </table>
+  </div>
 
-{% endblock %}
-{% block main %}
-    <script>$(document).ready(function () {
-        getData_plot('{{ stn }}');
-        table_actual('{{ stn }}');
-        table_forecast('{{ stn }}');
-    });</script>
+</main>
+
+<!-- ── FOOTER ────────────────────────────────────────────────────── -->
+<footer>
+  Data by <a href="https://api.trafikinfo.trafikverket.se/">Trafikverket</a> and
+  <a href="http://opendata.smhi.se/apidocs/metfcst/index.html">SMHI</a>
+  &nbsp;·&nbsp;
+  Published under <a href="https://creativecommons.org/publicdomain/zero/1.0/deed.sv">CC0</a>
+  &nbsp;·&nbsp;
+  <a href="https://github.com/Wolfrax/tv">Source on GitHub</a>
+  <br>Copyright &copy; Mats Melander
+</footer>
+
+<script>$(document).ready(function () {
+    getData_plot('{{ stn }}');
+    table_actual('{{ stn }}');
+    table_forecast('{{ stn }}');
+});</script>
+
 {% endblock %}
