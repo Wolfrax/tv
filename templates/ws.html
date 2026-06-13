@@ -72,6 +72,13 @@
   <div class="charts-grid">
 
     <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Temperature &amp; Humidity</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" id="temp-btn-24h" onclick="setTempRange('24h')">24 h</button>
+          <button class="chart-btn"        id="temp-btn-7d"  onclick="setTempRange('7d')">7 d</button>
+        </div>
+      </div>
       <div id="ws_temp" class="chart-container"></div>
     </div>
 
@@ -87,10 +94,24 @@
     </div>
 
     <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Wind Speed</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" id="wind-btn-24h" onclick="setWindRange('24h')">24 h</button>
+          <button class="chart-btn"        id="wind-btn-7d"  onclick="setWindRange('7d')">7 d</button>
+        </div>
+      </div>
       <div id="ws_wind" class="chart-container"></div>
     </div>
 
     <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Wind Rose</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" id="rose-btn-24h" onclick="setWindRoseRange('24h')">24 h</button>
+          <button class="chart-btn"        id="rose-btn-7d"  onclick="setWindRoseRange('7d')">7 d</button>
+        </div>
+      </div>
       <div id="ws_windrose" class="chart-container"></div>
     </div>
 

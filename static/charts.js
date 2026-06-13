@@ -39,7 +39,8 @@ Highcharts.setOptions({
     credits: { enabled: false }
 });
 
-function plot_ws(id, Title, yAx, obs) {
+function plot_ws(id, Title, yAx, obs, subtitle) {
+    subtitle = subtitle || 'Last 24 hours';
     Highcharts.chart(id, {
         chart: {
             type: 'spline',
@@ -85,7 +86,7 @@ function plot_ws(id, Title, yAx, obs) {
             text: Title
         },
         subtitle: {
-            text: 'Last 24 hours'
+            text: subtitle
         },
         xAxis: {
             type: 'datetime',
@@ -98,7 +99,8 @@ function plot_ws(id, Title, yAx, obs) {
     });
 }
 
-function plot_rose(obs, id, Title) {
+function plot_rose(obs, id, Title, subtitle) {
+    subtitle = subtitle || 'Last 24 hours';
     const categories = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
     Highcharts.chart(id, {
         series: obs,
@@ -111,7 +113,7 @@ function plot_rose(obs, id, Title) {
             text: Title
         },
         subtitle: {
-            text: 'Last 24 hours + forecast'
+            text: subtitle
         },
         legend: {
             align: 'right',

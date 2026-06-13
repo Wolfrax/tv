@@ -74,7 +74,7 @@ class Measurements:
             pass
 
         try:
-            with open('ws_7d.json', 'r', encoding='utf-8') as f:
+            with open('ws_7days.json', 'r', encoding='utf-8') as f:
                 try:
                     self.data7days = json.load(f)
                 except json.decoder.JSONDecodeError:
@@ -176,8 +176,15 @@ class Measurements:
             if ((dt - parse(self.data7days[0]['ts'])).total_seconds() / 3600 ) > (7 * 24.0):
                 self.data7days = self.data7days[1:]  # Keep record for 7 days only
 
-        self.data7days.append({'ts': head['Sample'],
-                               'rain': head['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent']['Value']})
+        self.data7days.append({
+            'ts':       head['Sample'],
+            'rain':     head['Aggregated5minutes']['Precipitation']['TotalWaterEquivalent']['Value'],
+            'temp':     head['Air']['Temperature']['Value'],
+            'hum':      head['Air']['RelativeHumidity']['Value'],
+            'wind':     head['Wind'][0]['Speed']['Value'],
+            'wind_max': head['Aggregated30minutes']['Wind']['SpeedMax']['Value'],
+            'wind_dir': head['Wind'][0]['Direction']['Value'],
+        })
 
         self._save()
 
