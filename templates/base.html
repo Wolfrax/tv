@@ -202,7 +202,28 @@
       padding: .75rem 1rem;
       box-shadow: var(--shadow);
     }
-    .chart-container { height: 300px; }
+    .chart-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .5rem;
+    }
+    .chart-card-title { font-size: .875rem; font-weight: 600; color: var(--text); }
+    .chart-btn-group  { display: flex; gap: 4px; }
+    .chart-btn {
+      font-size: .7rem;
+      padding: .2rem .55rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
+    }
+    .chart-btn:hover         { color: var(--text); border-color: var(--muted); }
+    .chart-btn.active        { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .chart-btn:disabled      { opacity: .3; cursor: not-allowed; pointer-events: none; }
+    .chart-container { height: 280px; }
 
     /* ── Map + table side-by-side ───────────────────────────────── */
     .map-table-grid {
@@ -292,7 +313,7 @@
       font-size: .7rem;
       text-transform: uppercase;
       letter-spacing: .07em;
-      color: var(--muted) !important;
+      color: var(--text) !important;
       font-weight: 600;
       border-bottom: 1px solid var(--border) !important;
       background-color: var(--surface) !important;

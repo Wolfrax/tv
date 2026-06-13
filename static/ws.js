@@ -5,6 +5,8 @@
 
 const API_BASE = '/tv_ws';
 
+let currentStn = '';
+
 let weather_data = {
     actual: {
         temp: [],
@@ -114,9 +116,51 @@ function table_forecast(stn) {
 }
 
 function concat() {
-    // Toggle flag and redo plotting
     weather_data.concat = !weather_data.concat;
     plot();
+}
+
+function renderRainChart(title, rain, rain_cum) {
+    Highcharts.charts.forEach(function (c) {
+        if (c && c.renderTo && c.renderTo.id === 'ws_rain') c.destroy();
+    });
+    plot_ws(
+        'ws_rain', title,
+        [{title: {text: 'Rain (mm)'}}, {title: {text: 'Rain acc (mm)'}, opposite: true}],
+        [
+            {yAxis: 0, name: 'Rain',     data: rain,     type: 'area', color: '#06b6d4', tooltip: {valueSuffix: 'mm'}},
+            {yAxis: 1, name: 'Rain acc', data: rain_cum,               color: '#a78bfa', tooltip: {valueSuffix: 'mm'}}
+        ]
+    );
+}
+
+function setRainRange(range) {
+    document.getElementById('rain-btn-24h').classList.toggle('active', range === '24h');
+    document.getElementById('rain-btn-7d').classList.toggle('active', range === '7d');
+
+    if (range === '7d') {
+        $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (json) {
+            let rain7d = json.data.map(d => [new Date(d.ts).getTime(), d.rain]);
+            let cum7d = [];
+            rain7d.reduce(function (a, b, i) {
+                return cum7d[i] = [rain7d[i][0], Math.round((a[1] + b[1]) * 10) / 10];
+            }, rain7d[0]);
+            renderRainChart('Rain (7 days)', rain7d, cum7d);
+        });
+    } else {
+        // Re-render 24 h view from existing weather_data
+        let rain = weather_data.concat
+            ? weather_data.actual.rain.concat(weather_data.forecast.rain)
+            : weather_data.actual.rain.slice();
+        let rain_for_acc = weather_data.concat
+            ? weather_data.actual.rain.concat(weather_data.forecast.rain_acc)
+            : weather_data.actual.rain.slice();
+        let cum = [];
+        rain_for_acc.reduce(function (a, b, i) {
+            return cum[i] = [rain_for_acc[i][0], Math.round((a[1] + b[1]) * 10) / 10];
+        }, rain_for_acc[0]);
+        renderRainChart('Rain (24 h)', rain, cum);
+    }
 }
 
 function plot() {
@@ -210,13 +254,7 @@ function plot() {
         ],
     );
 
-    plot_ws('ws_rain', 'Rain',
-        [{title: {text: 'Rain (mm)'}}, {title: {text: 'Rain acc (mm)'}, opposite: true}],
-        [
-            {yAxis: 0, name: 'Rain', data: rain, type: 'area', color: '#06b6d4', tooltip: {valueSuffix: 'mm'}},
-            {yAxis: 1, name: 'Rain acc', data: rain_cum, color: '#a78bfa', tooltip: {valueSuffix: 'mm'}}
-        ]
-    );
+    renderRainChart('Rain', rain, rain_cum);
 
     plot_ws('ws_wind', 'Wind',
         [{title: {text: 'Wind (m/s)'}}],
@@ -272,8 +310,7 @@ function plot() {
 }
 
 function getData_plot(stn) {
-    // First get weather data from trafikverket station
-    //$.getJSON('tv_ws/_ws', {stn: stn}, function (json) {
+    currentStn = stn;
     $.getJSON('/tv_ws/_ws', {stn: stn}, function (json) {
         let last = json.data.length - 1
 
@@ -303,7 +340,9 @@ function getData_plot(stn) {
             'W' + '<i class="bi bi-arrow-right"></i>',
             'NW' + '<i class="bi bi-arrow-down-right"></i>'];
 
-        $("#latest_wind_dir").html(categories[wind_dir / 45]);
+        // Direction is in degrees (0-360); round to nearest 45° compass point
+        let dirIndex = (typeof wind_dir === 'number') ? Math.round(wind_dir / 45) % 8 : null;
+        $("#latest_wind_dir").html(dirIndex !== null ? categories[dirIndex] : '—');
 
         // Now fill weather_data object with actual values
         weather_data.actual.first_sample = json.data[0].Sample;

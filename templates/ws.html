@@ -73,10 +73,51 @@
   </div>
 
   <div class="charts-grid">
-    <div class="chart-card"><div id="ws_temp"     class="chart-container"></div></div>
-    <div class="chart-card"><div id="ws_rain"     class="chart-container"></div></div>
-    <div class="chart-card"><div id="ws_wind"     class="chart-container"></div></div>
-    <div class="chart-card"><div id="ws_windrose" class="chart-container"></div></div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Temperature &amp; Humidity</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" disabled>24 h</button>
+          <button class="chart-btn" disabled title="7-day data not available">7 d</button>
+        </div>
+      </div>
+      <div id="ws_temp" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Precipitation</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" id="rain-btn-24h" onclick="setRainRange('24h')">24 h</button>
+          <button class="chart-btn"        id="rain-btn-7d"  onclick="setRainRange('7d')">7 d</button>
+        </div>
+      </div>
+      <div id="ws_rain" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Wind Speed</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" disabled>24 h</button>
+          <button class="chart-btn" disabled title="7-day data not available">7 d</button>
+        </div>
+      </div>
+      <div id="ws_wind" class="chart-container"></div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-card-header">
+        <span class="chart-card-title">Wind Rose</span>
+        <div class="chart-btn-group">
+          <button class="chart-btn active" disabled>24 h</button>
+          <button class="chart-btn" disabled title="7-day data not available">7 d</button>
+        </div>
+      </div>
+      <div id="ws_windrose" class="chart-container"></div>
+    </div>
+
   </div>
 
   <!-- ── MAP + LAST HOUR ───────────────────────────────────────── -->
