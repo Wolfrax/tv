@@ -32,7 +32,7 @@ let weather_data = {
         first_sample: "",
         last_sample: "",
     },
-    concat: true,
+    concat: false,
 };
 
 function table_actual(stn) {
@@ -113,11 +113,6 @@ function table_forecast(stn) {
             ],
         })
     });
-}
-
-function concat() {
-    weather_data.concat = !weather_data.concat;
-    plot();
 }
 
 function renderRainChart(title, rain, rain_cum) {
@@ -378,51 +373,7 @@ function getData_plot(stn) {
         }).addTo(map);
         L.marker([json.data[last].geometry.lat, json.data[last].geometry.lon]).addTo(map);
 
-        // Now get forecast data from SMHI
-        //$.getJSON('forecast/_fc', {
-        $.getJSON('/tv_ws/_fc', {
-            lat: json.data[last].geometry.lat,
-            lon: json.data[last].geometry.lon,
-        }, function (json) {
-            // Remove all elements in forecast that is older than 'now', thus avoiding overlap with actual
-            let now = new Date().getUTCTime();
-            json.data.forEach(elem => {
-                if (new Date(elem.time).getTime() <= now) {
-                    json.data.shift();
-                }
-            });
-
-            // Now fill weather_data object with forecast values
-            weather_data.forecast.first_sample = json.data[0].time.slice(0, 19).replace('T', ' ');
-            weather_data.forecast.last_sample = json.data[json.data.length - 1].time.slice(0, 19).replace('T', ' ');
-
-            json.data.forEach(function (elem, index) {
-                let t = new Date(elem.time).getTime();
-
-                // SMHI precipitation_amount_max is mm per forecast interval (1h, 3h, …).
-                // Compute the interval so we can normalise to mm/5min, matching the
-                // Trafikverket Aggregated5minutes unit used for the actual series.
-                let intervalMin;
-                if (index + 1 < json.data.length) {
-                    intervalMin = (new Date(json.data[index + 1].time).getTime() - t) / 60000;
-                } else {
-                    intervalMin = index > 0
-                        ? (t - new Date(json.data[index - 1].time).getTime()) / 60000
-                        : 60;
-                }
-
-                weather_data.forecast.temp.push([t, elem.temp]);
-                weather_data.forecast.hum.push([t, elem.hum]);
-                weather_data.forecast.rain.push([t, Math.round(elem.rain * 5 / intervalMin * 1000) / 1000]);
-                weather_data.forecast.rain_acc.push([t, elem.rain]);
-                weather_data.forecast.wind.push([t, elem.wind_speed]);
-                weather_data.forecast.wind_max.push([t, elem.wind_max]);
-                weather_data.forecast.wind_barb.push([t, elem.wind_speed, elem.wind_dir]);
-                weather_data.forecast.wind_dir.push([elem.wind_dir, elem.wind_speed]);
-            });
-
-            plot();
-        });
+        plot();
     });
 
     //$.getJSON('tv_ws/_ws7dayssum', {stn: stn}, function (json) {
