@@ -345,8 +345,8 @@
 
     /* ── Highcharts dark background ─────────────────────────────── */
     /* Override the SVG rect Highcharts renders regardless of JS config */
-    .highcharts-background { fill: transparent !important; }
-    .highcharts-plot-background { fill: transparent !important; }
+    .highcharts-background { fill: #101c2e !important; }
+    .highcharts-plot-background { fill: #101c2e !important; }
     /* Exporting button box on dark background */
     .highcharts-button-box { fill: var(--surface) !important; stroke: var(--border) !important; }
     .highcharts-contextbutton .highcharts-button-symbol { stroke: var(--muted) !important; }
@@ -387,8 +387,8 @@
   <script src="https://d3js.org/d3.v6.js"></script>
   <!-- App scripts -->
   <script>const MAPBOX_TOKEN = "{{ mapbox_token }}";</script>
-  <script src="{{ url_for('static', filename='ws.js', v='4') }}"></script>
-  <script src="{{ url_for('static', filename='charts.js', v='4') }}"></script>
+  <script src="{{ url_for('static', filename='ws.js', v='5') }}"></script>
+  <script src="{{ url_for('static', filename='charts.js', v='5') }}"></script>
   <script>$SCRIPT_ROOT = {{ request.script_root|tojson }};</script>
 </head>
 <body>

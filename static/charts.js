@@ -3,7 +3,7 @@ Highcharts.setOptions({
         timezone: 'Europe/Stockholm'
     },
     chart: {
-        backgroundColor: 'transparent',
+        backgroundColor: '#101c2e',
         style: { fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }
     },
     colors: ['#f97316', '#22c55e', '#06b6d4', '#a78bfa', '#f43f5e', '#60a5fa'],
@@ -11,21 +11,21 @@ Highcharts.setOptions({
         style: { color: '#e2e8f0', fontSize: '13px', fontWeight: '600' }
     },
     subtitle: {
-        style: { color: '#7d92b2', fontSize: '11px' }
+        style: { color: '#94a3b8', fontSize: '11px' }
     },
     xAxis: {
-        gridLineColor: '#253554',
-        lineColor: '#253554',
-        tickColor: '#253554',
-        labels: { style: { color: '#7d92b2' } },
-        title: { style: { color: '#7d92b2' } }
+        gridLineColor: '#2a3e5c',
+        lineColor: '#2a3e5c',
+        tickColor: '#2a3e5c',
+        labels: { style: { color: '#94a3b8' } },
+        title: { style: { color: '#94a3b8' } }
     },
     yAxis: {
-        gridLineColor: '#253554',
-        lineColor: '#253554',
-        tickColor: '#253554',
-        labels: { style: { color: '#7d92b2' } },
-        title: { style: { color: '#7d92b2' } }
+        gridLineColor: '#2a3e5c',
+        lineColor: '#2a3e5c',
+        tickColor: '#2a3e5c',
+        labels: { style: { color: '#94a3b8' } },
+        title: { style: { color: '#94a3b8' } }
     },
     legend: {
         itemStyle: { color: '#e2e8f0', fontWeight: '400' },
