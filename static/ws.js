@@ -21,7 +21,8 @@ let weather_data = {
     forecast: {
         temp: [],
         hum: [],
-        rain: [],
+        rain: [],     // mm/5min (normalized to match actual unit)
+        rain_acc: [], // mm/period (original SMHI values, for accumulation curve)
         wind: [],
         wind_max: [],
         wind_barb: [],
@@ -153,9 +154,15 @@ function plot() {
 
     $("#latest_time").html(latest_time);
 
-    rain.reduce(function (a, b, i) {
-        return rain_cum[i] = [rain[i][0], Math.round((a[1] + b[1]) * 10) / 10];
-    }, rain[0]);
+    // Build accumulation series using original mm/period SMHI values so the
+    // total stays correct even though 'rain' bars are normalised to mm/5min.
+    const rain_for_acc = weather_data.concat
+        ? weather_data.actual.rain.concat(weather_data.forecast.rain_acc)
+        : weather_data.actual.rain.slice();
+
+    rain_for_acc.reduce(function (a, b, i) {
+        return rain_cum[i] = [rain_for_acc[i][0], Math.round((a[1] + b[1]) * 10) / 10];
+    }, rain_for_acc[0]);
 
     $("#latest_cum_rain").html("\u03A3" + rain_cum[rain_cum.length - 1][1] + "mm");
 
@@ -353,11 +360,25 @@ function getData_plot(stn) {
             weather_data.forecast.first_sample = json.data[0].time.slice(0, 19).replace('T', ' ');
             weather_data.forecast.last_sample = json.data[json.data.length - 1].time.slice(0, 19).replace('T', ' ');
 
-            json.data.forEach(function (elem) {
+            json.data.forEach(function (elem, index) {
                 let t = new Date(elem.time).getTime();
+
+                // SMHI precipitation_amount_max is mm per forecast interval (1h, 3h, …).
+                // Compute the interval so we can normalise to mm/5min, matching the
+                // Trafikverket Aggregated5minutes unit used for the actual series.
+                let intervalMin;
+                if (index + 1 < json.data.length) {
+                    intervalMin = (new Date(json.data[index + 1].time).getTime() - t) / 60000;
+                } else {
+                    intervalMin = index > 0
+                        ? (t - new Date(json.data[index - 1].time).getTime()) / 60000
+                        : 60;
+                }
+
                 weather_data.forecast.temp.push([t, elem.temp]);
                 weather_data.forecast.hum.push([t, elem.hum]);
-                weather_data.forecast.rain.push([t, elem.rain]);
+                weather_data.forecast.rain.push([t, Math.round(elem.rain * 5 / intervalMin * 1000) / 1000]);
+                weather_data.forecast.rain_acc.push([t, elem.rain]);
                 weather_data.forecast.wind.push([t, elem.wind_speed]);
                 weather_data.forecast.wind_max.push([t, elem.wind_max]);
                 weather_data.forecast.wind_barb.push([t, elem.wind_speed, elem.wind_dir]);
