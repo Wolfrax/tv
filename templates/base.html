@@ -303,6 +303,16 @@
     table.dataTable tbody tr { background-color: transparent !important; }
     table.dataTable tbody tr.odd  { background-color: transparent !important; }
     table.dataTable tbody tr.even { background-color: #ffffff05 !important; }
+    /* Override the sorted-column highlight that DataTables adds to td.sorting_1 */
+    table.dataTable tbody td.sorting_1,
+    table.dataTable tbody td.sorting_2,
+    table.dataTable tbody td.sorting_3 { background-color: transparent !important; }
+    table.dataTable tbody tr.odd  td.sorting_1,
+    table.dataTable tbody tr.odd  td.sorting_2,
+    table.dataTable tbody tr.odd  td.sorting_3 { background-color: transparent !important; }
+    table.dataTable tbody tr.even td.sorting_1,
+    table.dataTable tbody tr.even td.sorting_2,
+    table.dataTable tbody tr.even td.sorting_3 { background-color: #ffffff05 !important; }
     table.dataTable tbody td {
       padding: .55rem 1rem !important;
       border-bottom: 1px solid #1e2e44 !important;
@@ -311,6 +321,14 @@
     }
     table.dataTable tbody tr:last-child td { border-bottom: none !important; }
     table.dataTable tbody tr:hover td { background-color: #ffffff0a !important; }
+
+    /* ── Highcharts dark background ─────────────────────────────── */
+    /* Override the SVG rect Highcharts renders regardless of JS config */
+    .highcharts-background { fill: transparent !important; }
+    .highcharts-plot-background { fill: transparent !important; }
+    /* Exporting button box on dark background */
+    .highcharts-button-box { fill: var(--surface) !important; stroke: var(--border) !important; }
+    .highcharts-contextbutton .highcharts-button-symbol { stroke: var(--muted) !important; }
 
     /* ── Footer ─────────────────────────────────────────────────── */
     footer {
