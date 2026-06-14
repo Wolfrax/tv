@@ -1,6 +1,8 @@
 const API_BASE = '/tv_ws';
 
 let currentStn = '';
+let stationCoords = { lat: null, lon: null };
+let forecastCache = null;
 
 let weather_data = {
     actual: {
@@ -100,17 +102,34 @@ function table_forecast(stn) {
     });
 }
 
-function renderRainChart(title, rain, rain_cum, subtitle) {
+// Fetch 7-day historical data and SMHI forecast in parallel, then call callback(histJson, fcJson).
+// fcJson is null if coordinates aren't known yet or if the SMHI request fails.
+// Result is cached so toggling between charts avoids repeated SMHI fetches.
+function fetch7dWithForecast(callback) {
+    $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (histJson) {
+        if (!stationCoords.lat) { callback(histJson, null); return; }
+        if (forecastCache)      { callback(histJson, forecastCache); return; }
+        $.getJSON(API_BASE + '/_fc', {lat: stationCoords.lat, lon: stationCoords.lon})
+            .done(function (fcJson) { forecastCache = fcJson; callback(histJson, fcJson); })
+            .fail(function ()       { callback(histJson, null); });
+    });
+}
+
+function renderRainChart(title, rain, rain_cum, subtitle, fc_rain) {
     Highcharts.charts.forEach(function (c) {
         if (c && c.renderTo && c.renderTo.id === 'ws_rain') c.destroy();
     });
+    let series = [
+        {yAxis: 0, name: 'Rain',     data: rain,     type: 'area', color: '#06b6d4', tooltip: {valueSuffix: ' mm'}},
+        {yAxis: 1, name: 'Rain acc', data: rain_cum,               color: '#a78bfa', tooltip: {valueSuffix: ' mm'}}
+    ];
+    if (fc_rain && fc_rain.length) series.push(
+        {yAxis: 0, name: 'Forecast rain', data: fc_rain, type: 'column', color: '#38bdf8', tooltip: {valueSuffix: ' mm/h'}}
+    );
     plot_ws(
         'ws_rain', title,
         [{title: {text: 'Rain (mm)'}}, {title: {text: 'Rain acc (mm)'}, opposite: true}],
-        [
-            {yAxis: 0, name: 'Rain',     data: rain,     type: 'area', color: '#06b6d4', tooltip: {valueSuffix: 'mm'}},
-            {yAxis: 1, name: 'Rain acc', data: rain_cum,               color: '#a78bfa', tooltip: {valueSuffix: 'mm'}}
-        ],
+        series,
         subtitle
     );
 }
@@ -120,13 +139,17 @@ function setRainRange(range) {
     document.getElementById('rain-btn-7d').classList.toggle('active', range === '7d');
 
     if (range === '7d') {
-        $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (json) {
-            let rain7d = json.data.map(d => [new Date(d.ts).getTime(), d.rain]);
+        fetch7dWithForecast(function (histJson, fcJson) {
+            let rain7d = histJson.data.map(d => [new Date(d.ts).getTime(), d.rain]);
             let cum7d = [];
             rain7d.reduce(function (a, b, i) {
                 return cum7d[i] = [rain7d[i][0], Math.round((a[1] + b[1]) * 10) / 10];
             }, rain7d[0]);
-            renderRainChart('Rain (7 days)', rain7d, cum7d, 'Last 7 days');
+            let fc_rain = fcJson
+                ? fcJson.data.filter(d => d.rain != null).map(d => [new Date(d.time).getTime(), d.rain])
+                : [];
+            let subtitle = fcJson ? 'Last 7 days + forecast' : 'Last 7 days';
+            renderRainChart('Rain (7 days)', rain7d, cum7d, subtitle, fc_rain);
         });
     } else {
         let rain = weather_data.actual.rain.slice();
@@ -138,10 +161,20 @@ function setRainRange(range) {
     }
 }
 
-function renderTempChart(temps, hums, subtitle) {
+function renderTempChart(temps, hums, subtitle, fc_temps, fc_hums) {
     Highcharts.charts.forEach(function (c) {
         if (c && c.renderTo && c.renderTo.id === 'ws_temp') c.destroy();
     });
+    let series = [
+        {yAxis: 0, name: 'Temperature', data: temps, color: '#f97316', tooltip: {valueSuffix: ' °C'}},
+        {yAxis: 1, name: 'Humidity',    data: hums,  color: '#22c55e', tooltip: {valueSuffix: ' %'}},
+    ];
+    if (fc_temps && fc_temps.length) series.push(
+        {yAxis: 0, name: 'Forecast temp', data: fc_temps, color: '#f97316', dashStyle: 'Dash', tooltip: {valueSuffix: ' °C'}}
+    );
+    if (fc_hums && fc_hums.length) series.push(
+        {yAxis: 1, name: 'Forecast hum',  data: fc_hums,  color: '#22c55e', dashStyle: 'Dash', tooltip: {valueSuffix: ' %'}}
+    );
     plot_ws('ws_temp', 'Temperature & Humidity',
         [
             {
@@ -156,10 +189,7 @@ function renderTempChart(temps, hums, subtitle) {
                 opposite: true,
             }
         ],
-        [
-            {yAxis: 0, name: 'Temperature', data: temps, color: '#f97316', tooltip: {valueSuffix: '°C'}},
-            {yAxis: 1, name: 'Humidity',    data: hums,  color: '#22c55e', tooltip: {valueSuffix: '%'}},
-        ],
+        series,
         subtitle
     );
 }
@@ -169,27 +199,40 @@ function setTempRange(range) {
     document.getElementById('temp-btn-7d').classList.toggle('active', range === '7d');
 
     if (range === '7d') {
-        $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (json) {
-            let temps = json.data.filter(d => d.temp != null).map(d => [new Date(d.ts).getTime(), d.temp]);
-            let hums  = json.data.filter(d => d.hum  != null).map(d => [new Date(d.ts).getTime(), d.hum]);
-            renderTempChart(temps, hums, 'Last 7 days');
+        fetch7dWithForecast(function (histJson, fcJson) {
+            let temps = histJson.data.filter(d => d.temp != null).map(d => [new Date(d.ts).getTime(), d.temp]);
+            let hums  = histJson.data.filter(d => d.hum  != null).map(d => [new Date(d.ts).getTime(), d.hum]);
+            let fc_temps = [], fc_hums = [];
+            if (fcJson) {
+                fc_temps = fcJson.data.filter(d => d.temp != null).map(d => [new Date(d.time).getTime(), d.temp]);
+                fc_hums  = fcJson.data.filter(d => d.hum  != null).map(d => [new Date(d.time).getTime(), d.hum]);
+            }
+            let subtitle = fcJson ? 'Last 7 days + forecast' : 'Last 7 days';
+            renderTempChart(temps, hums, subtitle, fc_temps, fc_hums);
         });
     } else {
         renderTempChart(weather_data.actual.temp.slice(), weather_data.actual.hum.slice(), 'Last 24 hours');
     }
 }
 
-function renderWindChart(wind_max, wind, wind_barb, subtitle) {
+function renderWindChart(wind_max, wind, wind_barb, subtitle, fc_wind, fc_wind_max) {
     Highcharts.charts.forEach(function (c) {
         if (c && c.renderTo && c.renderTo.id === 'ws_wind') c.destroy();
     });
+    let series = [
+        {name: 'Wind Max',  data: wind_max,  type: 'area', color: '#f43f5e', tooltip: {valueSuffix: ' m/s'}},
+        {name: 'Wind',      data: wind,                    color: '#a78bfa', tooltip: {valueSuffix: ' m/s'}},
+        {name: 'Wind barb', type: 'windbarb', data: wind_barb.filter((v, i) => i % 9 === 0)}
+    ];
+    if (fc_wind && fc_wind.length) series.push(
+        {name: 'Forecast wind',     data: fc_wind,     color: '#a78bfa', dashStyle: 'Dash', tooltip: {valueSuffix: ' m/s'}}
+    );
+    if (fc_wind_max && fc_wind_max.length) series.push(
+        {name: 'Forecast wind max', data: fc_wind_max, color: '#f43f5e', dashStyle: 'Dash', tooltip: {valueSuffix: ' m/s'}}
+    );
     plot_ws('ws_wind', 'Wind',
         [{title: {text: 'Wind (m/s)'}}],
-        [
-            {name: 'Wind Max',  data: wind_max,  type: 'area', color: '#f43f5e', tooltip: {valueSuffix: 'm/s'}},
-            {name: 'Wind',      data: wind,                    color: '#a78bfa', tooltip: {valueSuffix: 'm/s'}},
-            {name: 'Wind barb', type: 'windbarb', data: wind_barb.filter((v, i) => i % 9 === 0)}
-        ],
+        series,
         subtitle
     );
 }
@@ -199,12 +242,18 @@ function setWindRange(range) {
     document.getElementById('wind-btn-7d').classList.toggle('active', range === '7d');
 
     if (range === '7d') {
-        $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (json) {
-            let wind     = json.data.filter(d => d.wind     != null).map(d => [new Date(d.ts).getTime(), d.wind]);
-            let wind_max = json.data.filter(d => d.wind_max != null).map(d => [new Date(d.ts).getTime(), d.wind_max]);
-            let wind_barb = json.data.filter(d => d.wind != null && d.wind_dir != null)
-                                     .map(d => [new Date(d.ts).getTime(), d.wind, d.wind_dir]);
-            renderWindChart(wind_max, wind, wind_barb, 'Last 7 days');
+        fetch7dWithForecast(function (histJson, fcJson) {
+            let wind     = histJson.data.filter(d => d.wind     != null).map(d => [new Date(d.ts).getTime(), d.wind]);
+            let wind_max = histJson.data.filter(d => d.wind_max != null).map(d => [new Date(d.ts).getTime(), d.wind_max]);
+            let wind_barb = histJson.data.filter(d => d.wind != null && d.wind_dir != null)
+                                         .map(d => [new Date(d.ts).getTime(), d.wind, d.wind_dir]);
+            let fc_wind = [], fc_wind_max = [];
+            if (fcJson) {
+                fc_wind     = fcJson.data.filter(d => d.wind_speed != null).map(d => [new Date(d.time).getTime(), d.wind_speed]);
+                fc_wind_max = fcJson.data.filter(d => d.wind_max  != null).map(d => [new Date(d.time).getTime(), d.wind_max]);
+            }
+            let subtitle = fcJson ? 'Last 7 days + forecast' : 'Last 7 days';
+            renderWindChart(wind_max, wind, wind_barb, subtitle, fc_wind, fc_wind_max);
         });
     } else {
         renderWindChart(
@@ -260,11 +309,18 @@ function setWindRoseRange(range) {
     document.getElementById('rose-btn-7d').classList.toggle('active', range === '7d');
 
     if (range === '7d') {
-        $.getJSON(API_BASE + '/_ws7days', {stn: currentStn}, function (json) {
-            let wind_dirs = json.data
+        fetch7dWithForecast(function (histJson, fcJson) {
+            let wind_dirs = histJson.data
                 .filter(d => d.wind != null && d.wind_dir != null)
                 .map(d => [d.wind_dir, d.wind]);
-            renderWindRose(wind_dirs, 'Last 7 days');
+            if (fcJson) {
+                let fc_dirs = fcJson.data
+                    .filter(d => d.wind_speed != null && d.wind_dir != null)
+                    .map(d => [d.wind_dir, d.wind_speed]);
+                wind_dirs = wind_dirs.concat(fc_dirs);
+            }
+            let subtitle = fcJson ? 'Last 7 days + forecast' : 'Last 7 days';
+            renderWindRose(wind_dirs, subtitle);
         });
     } else {
         renderWindRose(weather_data.actual.wind_dir.slice(), 'Last 24 hours');
@@ -334,6 +390,11 @@ function getData_plot(stn) {
 
         weather_data.actual.first_sample = json.data[0].Sample;
         weather_data.actual.last_sample = json.data[last].Sample;
+
+        stationCoords = {
+            lat: json.data[last].geometry.lat,
+            lon: json.data[last].geometry.lon,
+        };
 
         for (const key of Object.keys(json.data)) {
             let t = new Date(json.data[key].Sample).getTime();
