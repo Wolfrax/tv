@@ -19,20 +19,20 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:      #0b1120;
-      --surface: #131d30;
-      --card:    #1a2742;
-      --border:  #253554;
-      --text:    #e2e8f0;
-      --muted:   #7d92b2;
-      --accent:  #3b82f6;
+      --bg:      #f0f4f8;
+      --surface: #ffffff;
+      --card:    #ffffff;
+      --border:  #e2e8f0;
+      --text:    #0f172a;
+      --muted:   #64748b;
+      --accent:  #2563eb;
       --temp:    #f97316;
-      --hum:     #22c55e;
-      --rain:    #06b6d4;
-      --wind:    #a78bfa;
-      --gust:    #f43f5e;
+      --hum:     #16a34a;
+      --rain:    #0891b2;
+      --wind:    #7c3aed;
+      --gust:    #e11d48;
       --radius:  12px;
-      --shadow:  0 4px 24px rgba(0,0,0,.45);
+      --shadow:  0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.08);
     }
 
     html { font-size: 16px; }
@@ -114,9 +114,9 @@
     .hero-right { margin-left: auto; display: flex; align-items: center; gap: 1rem; }
 
     .live-badge {
-      background: #14532d33;
-      border: 1px solid #22c55e55;
-      color: #4ade80;
+      background: #dcfce7;
+      border: 1px solid #86efac;
+      color: #15803d;
       font-size: .75rem;
       font-weight: 600;
       padding: .25rem .75rem;
@@ -128,7 +128,7 @@
     .live-badge::before {
       content: '';
       width: 6px; height: 6px;
-      background: #4ade80;
+      background: #22c55e;
       border-radius: 50%;
       animation: pulse 2s infinite;
     }
@@ -180,7 +180,7 @@
     /* ── Section headers ────────────────────────────────────────── */
     .section-header { display: flex; align-items: center; gap: .75rem; margin-bottom: 1rem; margin-top: 1.5rem; }
     .section-title  { font-size: 1rem; font-weight: 600; color: var(--text); white-space: nowrap; }
-    .section-pill   { font-size: .7rem; font-weight: 600; padding: .15rem .6rem; border-radius: 99px; background: #3b82f620; color: var(--accent); border: 1px solid #3b82f640; white-space: nowrap; }
+    .section-pill   { font-size: .7rem; font-weight: 600; padding: .15rem .6rem; border-radius: 99px; background: #eff6ff; color: var(--accent); border: 1px solid #bfdbfe; white-space: nowrap; }
     .section-sep    { flex: 1; height: 1px; background: var(--border); }
 
     .toggle-fc { display: flex; align-items: center; gap: .5rem; font-size: .8rem; color: var(--muted); cursor: pointer; user-select: none; white-space: nowrap; }
@@ -215,12 +215,12 @@
       padding: .2rem .55rem;
       border-radius: 6px;
       border: 1px solid var(--border);
-      background: transparent;
+      background: #f8fafc;
       color: var(--muted);
       cursor: pointer;
       transition: background .15s, color .15s, border-color .15s;
     }
-    .chart-btn:hover         { color: var(--text); border-color: var(--muted); }
+    .chart-btn:hover         { color: var(--text); border-color: #94a3b8; background: #f1f5f9; }
     .chart-btn.active        { background: var(--accent); border-color: var(--accent); color: #fff; }
     .chart-btn:disabled      { opacity: .3; cursor: not-allowed; pointer-events: none; }
     .chart-container { height: 280px; }
@@ -266,7 +266,7 @@
     }
     .table-card-sub { font-size: .72rem; color: var(--muted); font-weight: 400; }
 
-    /* ── DataTables dark overrides ──────────────────────────────── */
+    /* ── DataTables light overrides ─────────────────────────────── */
     .dataTables_wrapper { color: var(--text) !important; font-size: .8rem; background: transparent !important; }
     .dataTables_wrapper .dataTables_filter,
     .dataTables_wrapper .dataTables_length { padding: .6rem 1.25rem; color: var(--muted); }
@@ -274,7 +274,7 @@
     .dataTables_wrapper .dataTables_length label { color: var(--muted) !important; }
     .dataTables_wrapper .dataTables_filter input,
     .dataTables_wrapper .dataTables_length select {
-      background: var(--surface) !important;
+      background: #f8fafc !important;
       color: var(--text) !important;
       border: 1px solid var(--border) !important;
       border-radius: 6px;
@@ -284,7 +284,7 @@
     .dataTables_wrapper .dataTables_info { padding: .5rem 1.25rem; color: var(--muted) !important; font-size: .72rem; }
     .dataTables_wrapper .dataTables_paginate { padding: .5rem 1.25rem; }
     .dataTables_wrapper .dataTables_paginate .paginate_button {
-      background: transparent !important;
+      background: #f8fafc !important;
       border: 1px solid var(--border) !important;
       color: var(--muted) !important;
       border-radius: 6px !important;
@@ -301,7 +301,7 @@
     .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
     .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
       color: var(--border) !important;
-      background: transparent !important;
+      background: #f8fafc !important;
       border-color: var(--border) !important;
       cursor: default;
     }
@@ -313,17 +313,17 @@
       font-size: .7rem;
       text-transform: uppercase;
       letter-spacing: .07em;
-      color: var(--text) !important;
+      color: var(--muted) !important;
       font-weight: 600;
       border-bottom: 1px solid var(--border) !important;
-      background-color: var(--surface) !important;
+      background-color: #f8fafc !important;
     }
     table.dataTable thead th.sorting,
     table.dataTable thead th.sorting_asc,
     table.dataTable thead th.sorting_desc { background-image: none !important; }
     table.dataTable tbody tr { background-color: transparent !important; }
     table.dataTable tbody tr.odd  { background-color: transparent !important; }
-    table.dataTable tbody tr.even { background-color: #ffffff05 !important; }
+    table.dataTable tbody tr.even { background-color: #f8fafc !important; }
     /* Override the sorted-column highlight that DataTables adds to td.sorting_1 */
     table.dataTable tbody td.sorting_1,
     table.dataTable tbody td.sorting_2,
@@ -333,22 +333,20 @@
     table.dataTable tbody tr.odd  td.sorting_3 { background-color: transparent !important; }
     table.dataTable tbody tr.even td.sorting_1,
     table.dataTable tbody tr.even td.sorting_2,
-    table.dataTable tbody tr.even td.sorting_3 { background-color: #ffffff05 !important; }
+    table.dataTable tbody tr.even td.sorting_3 { background-color: #f8fafc !important; }
     table.dataTable tbody td {
       padding: .55rem 1rem !important;
-      border-bottom: 1px solid #1e2e44 !important;
+      border-bottom: 1px solid var(--border) !important;
       border-top: none !important;
       color: var(--text) !important;
     }
     table.dataTable tbody tr:last-child td { border-bottom: none !important; }
-    table.dataTable tbody tr:hover td { background-color: #ffffff0a !important; }
+    table.dataTable tbody tr:hover td { background-color: #f1f5f9 !important; }
 
-    /* ── Highcharts dark background ─────────────────────────────── */
-    /* Override the SVG rect Highcharts renders regardless of JS config */
-    .highcharts-background { fill: #101c2e !important; }
-    .highcharts-plot-background { fill: #101c2e !important; }
-    /* Exporting button box on dark background */
-    .highcharts-button-box { fill: var(--surface) !important; stroke: var(--border) !important; }
+    /* ── Highcharts light background ────────────────────────────── */
+    .highcharts-background { fill: #ffffff !important; }
+    .highcharts-plot-background { fill: #ffffff !important; }
+    .highcharts-button-box { fill: #f8fafc !important; stroke: var(--border) !important; }
     .highcharts-contextbutton .highcharts-button-symbol { stroke: var(--muted) !important; }
 
     /* ── Footer ─────────────────────────────────────────────────── */
@@ -359,6 +357,7 @@
       font-size: .75rem;
       color: var(--muted);
       line-height: 1.9;
+      background: var(--surface);
     }
     footer a { color: var(--muted); }
     footer a:hover { color: var(--text); }

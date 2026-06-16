@@ -3,38 +3,39 @@ Highcharts.setOptions({
         timezone: 'Europe/Stockholm'
     },
     chart: {
-        backgroundColor: '#101c2e',
+        backgroundColor: '#ffffff',
         style: { fontFamily: "'Segoe UI', system-ui, -apple-system, sans-serif" }
     },
-    colors: ['#f97316', '#22c55e', '#06b6d4', '#a78bfa', '#f43f5e', '#60a5fa'],
+    colors: ['#f97316', '#16a34a', '#0891b2', '#7c3aed', '#e11d48', '#2563eb'],
     title: {
-        style: { color: '#e2e8f0', fontSize: '13px', fontWeight: '600' }
+        style: { color: '#0f172a', fontSize: '13px', fontWeight: '600' }
     },
     subtitle: {
-        style: { color: '#94a3b8', fontSize: '11px' }
+        style: { color: '#64748b', fontSize: '11px' }
     },
     xAxis: {
-        gridLineColor: '#2a3e5c',
-        lineColor: '#2a3e5c',
-        tickColor: '#2a3e5c',
-        labels: { style: { color: '#94a3b8' } },
-        title: { style: { color: '#94a3b8' } }
+        gridLineColor: '#f1f5f9',
+        lineColor: '#e2e8f0',
+        tickColor: '#e2e8f0',
+        labels: { style: { color: '#64748b' } },
+        title: { style: { color: '#64748b' } }
     },
     yAxis: {
-        gridLineColor: '#2a3e5c',
-        lineColor: '#2a3e5c',
-        tickColor: '#2a3e5c',
-        labels: { style: { color: '#94a3b8' } },
-        title: { style: { color: '#94a3b8' } }
+        gridLineColor: '#f1f5f9',
+        lineColor: '#e2e8f0',
+        tickColor: '#e2e8f0',
+        labels: { style: { color: '#64748b' } },
+        title: { style: { color: '#64748b' } }
     },
     legend: {
-        itemStyle: { color: '#e2e8f0', fontWeight: '400' },
-        itemHoverStyle: { color: '#ffffff' }
+        itemStyle: { color: '#0f172a', fontWeight: '400' },
+        itemHoverStyle: { color: '#2563eb' }
     },
     tooltip: {
-        backgroundColor: '#131d30',
-        borderColor: '#253554',
-        style: { color: '#e2e8f0' }
+        backgroundColor: '#ffffff',
+        borderColor: '#e2e8f0',
+        shadow: true,
+        style: { color: '#0f172a' }
     },
     credits: { enabled: false }
 });
