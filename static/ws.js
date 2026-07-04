@@ -327,6 +327,25 @@ function setWindRoseRange(range) {
     }
 }
 
+// Local midnight is always within the trailing 24h window ws.json carries,
+// so the same "rain" series used for the 24h total covers it - no extra
+// fetch needed.
+function rainSinceMidnight(rain) {
+    const midnight = new Date();
+    midnight.setHours(0, 0, 0, 0);
+    const cutoff = midnight.getTime();
+
+    let sum = 0;
+    rain.forEach(function (point) {
+        if (point[0] >= cutoff) {
+            const val = parseFloat(point[1]);
+            if (!isNaN(val)) sum += val;
+        }
+    });
+
+    return Math.round(sum * 10) / 10;
+}
+
 function plot() {
     let rain_cum = [];
 
@@ -346,7 +365,7 @@ function plot() {
         return rain_cum[i] = [rain[i][0], Math.round((a[1] + b[1]) * 10) / 10];
     }, rain[0]);
 
-    $("#latest_cum_rain").html("Σ" + rain_cum[rain_cum.length - 1][1] + "mm");
+    $("#latest_cum_rain").html("Σ" + rainSinceMidnight(rain) + "mm");
 
     renderTempChart(temps, hums, 'Last 24 hours');
     renderRainChart('Rain', rain, rain_cum, 'Last 24 hours');
